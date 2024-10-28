@@ -5,6 +5,7 @@ import 'package:e_katalog/controller/auth_controller.dart';
 import 'package:e_katalog/controller/navigation_controller.dart';
 import 'package:e_katalog/view/about/about_view.dart';
 import 'package:e_katalog/view/cart/cart_view.dart';
+import 'package:e_katalog/view/colors/colors_view.dart';
 import 'package:e_katalog/view/home/home_view.dart';
 import 'package:e_katalog/view/profile/profile_view.dart';
 import 'package:flutter/material.dart';
@@ -42,12 +43,10 @@ class NavigationView extends StatelessWidget {
                         return const HomeView();
                       case 1:
                         return authController.userAccount.value!.role == "admin"
-                            ? const AboutView()
+                            ? const ColorsView()
                             : const CartView();
                       case 2:
-                        return authController.userAccount.value!.role == "admin"
-                            ? const ProfileView()
-                            : const AboutView();
+                        return const AboutView();
                       case 3:
                         return const ProfileView();
 
@@ -65,6 +64,10 @@ class NavigationView extends StatelessWidget {
                                   label: 'Home',
                                 ),
                                 BottomNavigationBarItem(
+                                  icon: Icon(Icons.color_lens),
+                                  label: 'Colors',
+                                ),
+                                BottomNavigationBarItem(
                                   icon: Icon(Icons.store),
                                   label: 'about',
                                 ),
@@ -74,6 +77,9 @@ class NavigationView extends StatelessWidget {
                                 ),
                               ],
                               currentIndex: controller.currentView.value,
+                              unselectedIconTheme: const IconThemeData(
+                                color: AppColors.tertiary,
+                              ),
                               selectedItemColor: AppColors.primary,
                               onTap: (index) {
                                 controller.currentView.value = index;

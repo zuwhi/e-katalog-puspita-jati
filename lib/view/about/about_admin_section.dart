@@ -36,6 +36,8 @@ class AboutAdminSection extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Center(
               child: TextGelasio(
@@ -118,6 +120,12 @@ class AboutAdminSection extends StatelessWidget {
                   const SizedBox(
                     height: 25.0,
                   ),
+                  // MultiColorPicker(
+                  //   controller: controller,
+                  // ),
+                  const SizedBox(
+                    height: 20.0,
+                  ),
                   Obx(
                     () => ButtonPrimary(
                         text: "Ubah Profile",
@@ -148,3 +156,98 @@ class AboutAdminSection extends StatelessWidget {
     );
   }
 }
+
+// class MultiColorPicker extends StatelessWidget {
+//   final AboutController controller;
+
+//   const MultiColorPicker({super.key, required this.controller});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return SizedBox(
+//       width: double.infinity,
+//       child: Column(
+//         crossAxisAlignment: CrossAxisAlignment.start,
+//         mainAxisAlignment: MainAxisAlignment.start,
+//         children: [
+//           const Text("Pilih Warna Untuk Semua Item Product"),
+//           const SizedBox(height: 10),
+//           ElevatedButton(
+//             style: ElevatedButton.styleFrom(
+//               elevation: 0,
+//               side: const BorderSide(color: Colors.black38),
+//               backgroundColor: Colors.transparent,
+//               shape: RoundedRectangleBorder(
+//                 borderRadius: BorderRadius.circular(12),
+//               ),
+//             ),
+//             onPressed: () {
+//               showDialog(
+//                 context: context,
+//                 builder: (BuildContext context) {
+//                   Color pickerColor = Colors.blue;
+//                   return AlertDialog(
+//                     title: const Text('Pilih Warna'),
+//                     content: SingleChildScrollView(
+//                       child: ColorPicker(
+//                         pickerColor: pickerColor,
+//                         onColorChanged: (Color color) {
+//                           pickerColor = color;
+//                         },
+//                       ),
+//                     ),
+//                     actions: <Widget>[
+//                       TextButton(
+//                         child: const Text('Pilih'),
+//                         onPressed: () {
+//                           controller.addColor(pickerColor);
+//                           Navigator.of(context).pop();
+//                         },
+//                       ),
+//                     ],
+//                   );
+//                 },
+//               );
+//             },
+//             child: const Text("Tambah Warna"),
+//           ),
+//           const SizedBox(height: 10),
+//           Container(
+//             padding: const EdgeInsets.all(10),
+//             width: double.infinity,
+//             decoration: BoxDecoration(
+//                 borderRadius: BorderRadius.circular(5),
+//                 color: AppColors.disable),
+//             child: Obx(() => Wrap(
+//                   spacing: 8.0,
+//                   children: List.generate(
+//                     controller.selectedColors.length,
+//                     (index) {
+//                       final colorHex = controller.selectedColors[index];
+
+//                       Color color =
+//                           Color(int.parse(colorHex.replaceFirst('#', '0xff')));
+//                       return Chip(
+//                         backgroundColor: color,
+//                         label: Text(
+//                           controller.selectedColors[index],
+//                           style: const TextStyle(
+//                             color: Colors.white,
+//                           ),
+//                         ),
+//                         side: const BorderSide(color: Colors.black26),
+//                         deleteIcon: const Icon(
+//                           Icons.close,
+//                           color: Colors.red,
+//                         ),
+//                         onDeleted: () => controller.removeColor(index),
+//                       );
+//                     },
+//                   ),
+//                 )),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }

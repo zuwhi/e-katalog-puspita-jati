@@ -6,7 +6,6 @@ import 'package:e_katalog/controller/about_controller.dart';
 import 'package:e_katalog/controller/auth_controller.dart';
 import 'package:e_katalog/controller/cart_controller.dart';
 import 'package:e_katalog/controller/set_product_controller.dart';
-import 'package:e_katalog/helper/format_color.dart';
 import 'package:e_katalog/helper/format_rupiah.dart';
 import 'package:e_katalog/model/cart_model.dart';
 import 'package:e_katalog/model/product_model.dart';
@@ -56,7 +55,7 @@ class DetailProductView extends StatelessWidget {
     List<String> stringColors = product.color!.split(",");
 
     List<Color> colors = stringColors
-        .map((color) => getColorByName(color.trim().toLowerCase()))
+        .map((color) => Color(int.parse(color.replaceFirst('#', '0xff'))))
         .toList();
 
     String getWaktuKategori() {

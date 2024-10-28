@@ -3,6 +3,7 @@ import 'package:e_katalog/constant/app_colors.dart';
 import 'package:e_katalog/constant/app_route.dart';
 import 'package:e_katalog/controller/about_controller.dart';
 import 'package:e_katalog/controller/auth_controller.dart';
+import 'package:e_katalog/controller/colors_controller.dart';
 import 'package:e_katalog/controller/product_controller.dart';
 import 'package:e_katalog/helper/format_rupiah.dart';
 import 'package:e_katalog/model/product_model.dart';
@@ -24,6 +25,9 @@ class HomeView extends StatelessWidget {
     final AboutController aboutController = Get.put(AboutController());
     aboutController.getAboutDesc();
 
+    final ColorsController controller = Get.put(ColorsController());
+    controller.getColorsList();
+
     return authController.isLoading.value ||
             authController.userAccount.value == null
         ? const Center(child: CircularProgressIndicator())
@@ -37,11 +41,8 @@ class HomeView extends StatelessWidget {
                 child: Column(
                   children: [
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const SizedBox(
-                          width: 40.0,
-                        ),
                         Column(
                           children: [
                             TextGelasio(
@@ -55,30 +56,37 @@ class HomeView extends StatelessWidget {
                                 color: AppColors.primary),
                           ],
                         ),
-                        authController.userAccount.value != null
-                            ? SizedBox(
-                                width: 40.0,
-                                child: authController.userAccount.value!.role ==
-                                        "admin"
-                                    ? Padding(
-                                        padding:
-                                            const EdgeInsets.only(right: 5.0),
-                                        child: IconButton(
-                                            onPressed: () {
-                                              Get.toNamed(AppRoute.setProduct);
-                                            },
-                                            icon: const Icon(
-                                              Icons.add,
-                                              size: 28,
-                                            )),
-                                      )
-                                    : null,
-                              )
-                            : Container(),
                       ],
                     ),
                     const SizedBox(
-                      height: 20.0,
+                      height: 10.0,
+                    ),
+                    authController.userAccount.value != null
+                        ? authController.userAccount.value!.role == "admin"
+                            ? Align(
+                                alignment: Alignment.topRight,
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    elevation: 0,
+                                    side:
+                                        const BorderSide(color: Colors.black38),
+                                    backgroundColor: Colors.transparent,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    Get.toNamed(AppRoute.setProduct);
+                                  },
+                                  child: const Text("Tambah Item"),
+                                ),
+                              )
+                            : const SizedBox(
+                                height: 0.0,
+                              )
+                        : Container(),
+                    const SizedBox(
+                      height: 10.0,
                     ),
                     const CategoryWidget(),
                     const SizedBox(
@@ -218,17 +226,10 @@ class CategoryWidget extends StatelessWidget {
               controller: controller,
             ),
             CardCategory(
-              image: "assets/images/sofa.svg",
-              title: "sofa",
-              index: 5,
-              isActive: controller.categoryIndex.value == 5,
-              controller: controller,
-            ),
-            CardCategory(
               image: "assets/images/bed.svg",
               title: "bed",
-              index: 6,
-              isActive: controller.categoryIndex.value == 6,
+              index: 5,
+              isActive: controller.categoryIndex.value == 5,
               controller: controller,
             ),
           ],

@@ -9,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:logger/logger.dart';
 
 class PickedColor {
   final int id;
@@ -68,7 +67,6 @@ class SetProductController extends GetxController {
         Get.offAllNamed(AppRoute.nav);
       }
     } catch (e) {
-      Logger().d("kelashan di addproduct : $e");
       Get.snackbar("terjadi kesalahan", e.toString());
     } finally {
       isLoading.value = false;
@@ -117,6 +115,19 @@ class SetProductController extends GetxController {
   }
 
   var selectedColors = <String>[].obs;
+
+  var availableColors = <String>[].obs;
+
+  // Fungsi untuk menambahkan atau menghapus warna dari daftar pilihan
+  void toggleColor(String color) {
+    if (selectedColors.contains(color)) {
+      selectedColors.remove(color);
+    } else {
+      selectedColors.add(color);
+   
+    }
+  }
+
   final List<String> colors = [
     "coklat",
     "silver",

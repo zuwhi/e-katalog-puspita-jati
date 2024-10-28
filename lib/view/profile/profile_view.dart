@@ -233,6 +233,7 @@ class ProfileView extends StatelessWidget {
                               UserModel updatedAccount = UserModel(
                                 id: authController.userAccount.value!.id,
                                 name: nameController.text,
+                                role: authController.userAccount.value!.role,
                                 telepon: phoneController.text,
                                 alamat: alamatController.text,
                               );

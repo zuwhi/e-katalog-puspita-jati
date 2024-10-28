@@ -5,6 +5,7 @@ import 'package:e_katalog/view/about/about_view.dart';
 import 'package:e_katalog/view/auth/login_view.dart';
 import 'package:e_katalog/view/auth/register_view.dart';
 import 'package:e_katalog/view/cart/cart_view.dart';
+import 'package:e_katalog/view/colors/colors_view.dart';
 import 'package:e_katalog/view/home/home_view.dart';
 import 'package:e_katalog/view/home/navigation_view.dart';
 import 'package:e_katalog/view/loading.dart';
@@ -95,6 +96,10 @@ class MyApp extends StatelessWidget {
           GetPage(
             name: AppRoute.loading,
             page: () => const LoadingView(),
+          ),
+          GetPage(
+            name: AppRoute.colors,
+            page: () => const ColorsView(),
           ),
         ]);
   }

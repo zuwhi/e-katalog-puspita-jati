@@ -33,6 +33,20 @@ class EditProductController extends GetxController {
   RxString bucket2 = "".obs;
   RxString bucket3 = "".obs;
 
+  
+  var selectedColors = <String>[].obs;
+
+  var availableColors = <String>[].obs;
+
+  // Fungsi untuk menambahkan atau menghapus warna dari daftar pilihan
+  void toggleColor(String color) {
+    if (selectedColors.contains(color)) {
+      selectedColors.remove(color);
+    } else {
+      selectedColors.add(color);
+    }
+  }
+
   void fillControllers(ProductModel product) {
     productId.value = product.id;
     productNameController.text = product.title;
@@ -123,7 +137,6 @@ class EditProductController extends GetxController {
     imageFiles[index] = null;
   }
 
-  var selectedColors = <String>[].obs;
 
   final List<String> colors = [
     "coklat",

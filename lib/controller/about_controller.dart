@@ -1,5 +1,6 @@
 import 'package:e_katalog/model/about_model.dart';
 import 'package:e_katalog/service/appwrite_service.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class AboutController extends GetxController {
@@ -7,12 +8,13 @@ class AboutController extends GetxController {
   final aboutModelDesc = Rx<AboutModel?>(null);
   RxBool isLoading = false.obs;
 
+
   Future<void> getAboutDesc() async {
     isLoading.value = true;
-    if (aboutModelDesc.value != null) {
-      isLoading.value = false;
-      return;
-    }
+    // if (aboutModelDesc.value != null) {
+    //   isLoading.value = false;
+    //   return;
+    // }
     final result = await _appwriteService.getAboutDesc();
     if (result.isSuccess) {
       aboutModelDesc.value = AboutModel.fromMap(result.resultValue);
@@ -26,11 +28,13 @@ class AboutController extends GetxController {
     isLoading.value = true;
     final result = await _appwriteService.updateAboutDesc(aboutModel);
     if (result.isSuccess) {
-      getAboutDesc(); 
+      await getAboutDesc();
       Get.snackbar("Success", "Berhasil mengubah profile");
     } else {
       Get.snackbar("Terjadi kesalahan", "periksa koneksi anda");
     }
     isLoading.value = false;
   }
+
+ 
 }

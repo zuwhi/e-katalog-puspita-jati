@@ -11,6 +11,7 @@ class AppRoute {
   static const String cart = '/cart';
   static const String loading = '/loading';
   static const String about = '/about';
+  static const String colors = '/colors';
 
 
 }

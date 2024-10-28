@@ -50,9 +50,8 @@ class ProductController extends GetxController {
       case 4:
         return "lemari";
       case 5:
-        return "sofa";
-      case 6:
         return "bed";
+  
 
       default:
         return "All";

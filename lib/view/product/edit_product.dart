@@ -3,15 +3,15 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:e_katalog/constant/app_colors.dart';
+import 'package:e_katalog/controller/colors_controller.dart';
 import 'package:e_katalog/controller/edit_product_controller.dart';
 import 'package:e_katalog/model/product_model.dart';
 import 'package:e_katalog/view/global/button_primary.dart';
+import 'package:e_katalog/view/global/text_form_primary.dart';
 import 'package:e_katalog/view/global/text_gelasio.dart';
 import 'package:e_katalog/view/product/widget/empty_image_picker_widget.dart';
-import 'package:e_katalog/view/global/text_form_primary.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class EditProductView extends StatelessWidget {
@@ -23,6 +23,13 @@ class EditProductView extends StatelessWidget {
     final ProductModel product = arg['product'];
     final EditProductController editProductController =
         Get.put(EditProductController());
+    final ColorsController colorsController = Get.find();
+    editProductController.availableColors.value =
+        colorsController.colorsModel.value!.colors.split(",");
+
+    editProductController.selectedColors.value = product.color!.split(",");
+    print(editProductController.availableColors);
+    print(editProductController.selectedColors);
 
     editProductController.fillControllers(product);
 
@@ -260,66 +267,72 @@ class CarouselProductImage extends StatelessWidget {
           const SizedBox(
             height: 15.0,
           ),
-          ColorPickerWidget(editProductController: editProductController),
+          MultiColorPickerWidget(controller: editProductController)
         ],
       );
     });
   }
 }
 
-class ColorPickerWidget extends StatelessWidget {
-  const ColorPickerWidget({
-    super.key,
-    required this.editProductController,
-  });
+class MultiColorPickerWidget extends StatelessWidget {
+  final EditProductController controller;
 
-  final EditProductController editProductController;
+  const MultiColorPickerWidget({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey),
-          borderRadius: const BorderRadius.all(Radius.circular(8))),
-      child: MultiSelectDialogField(
-        items: editProductController.colors
-            .map((color) => MultiSelectItem<String>(color, color))
-            .toList(),
-        title: const Text("Colors"),
-        dialogWidth: MediaQuery.of(context).size.width,
-        confirmText:
-            const Text("Simpan", style: TextStyle(color: AppColors.primary)),
-        cancelText:
-            const Text("Batal", style: TextStyle(color: AppColors.primary)),
-        checkColor: Colors.white,
-        selectedColor: AppColors.primary,
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.white),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "Pilih Warna:",
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
-        buttonIcon: const Icon(
-          Icons.arrow_drop_down,
-          color: AppColors.primary,
-        ),
-        buttonText: const Text(
-          "Pilih Warna",
-          style: TextStyle(
-            color: AppColors.primary,
-            fontSize: 16,
+        const SizedBox(height: 10),
+        Obx(
+          () => GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 6,
+              crossAxisSpacing: 5,
+              mainAxisSpacing: 5,
+              childAspectRatio: 1,
+            ),
+            itemCount: controller.availableColors.length,
+            itemBuilder: (context, index) {
+              final colorHex =
+                  controller.availableColors[index].trim().toUpperCase();
+              final color =
+                  Color(int.parse(colorHex.replaceFirst('#', '0xff')));
+
+              return GestureDetector(
+                onTap: () => controller.toggleColor(colorHex),
+                child: Obx(() {
+                  // Standardize selectedColors for comparison
+                  final isSelected = controller.selectedColors
+                      .map((c) => c.trim().toUpperCase())
+                      .contains(colorHex);
+
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: color,
+                      border: Border.all(
+                        color: isSelected ? Colors.black : Colors.black12,
+                        width: isSelected ? 2 : 1,
+                      ),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: isSelected
+                        ? const Icon(Icons.check, color: Colors.white)
+                        : null,
+                  );
+                }),
+              );
+            },
           ),
         ),
-        initialValue: editProductController.selectedColors,
-        onConfirm: (results) {
-          editProductController.selectedColors.value = results.cast<String>();
-        },
-        chipDisplay: MultiSelectChipDisplay(
-          chipColor: AppColors.disable,
-          textStyle: const TextStyle(color: AppColors.primary),
-          onTap: (value) {
-            editProductController.selectedColors.remove(value);
-          },
-        ),
-      ),
+      ],
     );
   }
 }

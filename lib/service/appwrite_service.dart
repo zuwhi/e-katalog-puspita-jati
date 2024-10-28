@@ -55,10 +55,36 @@ class AppwriteService extends GetxService {
             "email": aboutModel?.email,
             "website": aboutModel?.website,
             "alamat": aboutModel?.alamat,
-            "koordinat": aboutModel?.koordinat
+            "koordinat": aboutModel?.koordinat,
           });
       return const Result.success("success");
     } catch (e) {
+      return Result.failed(e.toString());
+    }
+  }
+
+  Future<Result> updateColors(String colorsId, String colors) async {
+    try {
+      await databases.updateDocument(
+          databaseId: AppwriteConstants.databaseId,
+          collectionId: AppwriteConstants.colorsCollectionID,
+          documentId: colorsId,
+          data: {"colors": colors});
+      return const Result.success("success");
+    } catch (e) {
+      return Result.failed(e.toString());
+    }
+  }
+
+  Future<Result> getColorsList() async {
+    try {
+      final result = await databases.listDocuments(
+          databaseId: AppwriteConstants.databaseId,
+          collectionId: AppwriteConstants.colorsCollectionID);
+      Logger().d(result);
+      return Result.success(result.documents[0].data);
+    } catch (e) {
+      Logger().d(e);
       return Result.failed(e.toString());
     }
   }
@@ -227,7 +253,7 @@ class AppwriteService extends GetxService {
 
       Map<String, dynamic> data = {
         "name": user.name,
-        "role": "guest",
+        "role": user.role,
         "telepon": user.telepon,
         "alamat": user.alamat,
       };

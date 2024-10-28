@@ -10,6 +10,7 @@ class AboutModel {
   String? alamat;
   String? desc;
   String? koordinat;
+  String? colors;
   AboutModel({
     this.id,
     this.title,
@@ -19,6 +20,7 @@ class AboutModel {
     this.alamat,
     this.desc,
     this.koordinat,
+    this.colors,
   });
 
   AboutModel copyWith({
@@ -30,6 +32,7 @@ class AboutModel {
     String? alamat,
     String? desc,
     String? koordinat,
+    String? colors,
   }) {
     return AboutModel(
       id: id ?? this.id,
@@ -40,6 +43,7 @@ class AboutModel {
       alamat: alamat ?? this.alamat,
       desc: desc ?? this.desc,
       koordinat: koordinat ?? this.koordinat,
+      colors: colors ?? this.colors,
     );
   }
 
@@ -53,8 +57,9 @@ class AboutModel {
       'alamat': alamat,
       'desc': desc,
       'koordinat': koordinat,
+      'colors': colors,
     };
-  } 
+  }
 
   factory AboutModel.fromMap(Map<String, dynamic> map) {
     return AboutModel(
@@ -66,6 +71,7 @@ class AboutModel {
       alamat: map['alamat'] != null ? map['alamat'] as String : null,
       desc: map['desc'] != null ? map['desc'] as String : null,
       koordinat: map['koordinat'] != null ? map['koordinat'] as String : null,
+      colors: map['colors'] != null ? map['colors'] as String : null,
     );
   }
 
@@ -76,7 +82,7 @@ class AboutModel {
 
   @override
   String toString() {
-    return 'AboutModel(id: $id, title: $title, telepon: $telepon, email: $email, website: $website, alamat: $alamat, desc: $desc, koordinat: $koordinat)';
+    return 'AboutModel(id: $id, title: $title, telepon: $telepon, email: $email, website: $website, alamat: $alamat, desc: $desc, koordinat: $koordinat, colors: $colors)';
   }
 
   @override
@@ -90,7 +96,8 @@ class AboutModel {
         other.website == website &&
         other.alamat == alamat &&
         other.desc == desc &&
-        other.koordinat == koordinat;
+        other.koordinat == koordinat &&
+        other.colors == colors;
   }
 
   @override
@@ -102,6 +109,7 @@ class AboutModel {
         website.hashCode ^
         alamat.hashCode ^
         desc.hashCode ^
-        koordinat.hashCode;
+        koordinat.hashCode ^
+        colors.hashCode;
   }
 }
