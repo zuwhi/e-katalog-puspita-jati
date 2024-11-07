@@ -1,3 +1,4 @@
+import 'package:device_preview/device_preview.dart';
 import 'package:e_katalog/constant/app_route.dart';
 import 'package:e_katalog/controller/auth_controller.dart';
 import 'package:e_katalog/service/appwrite_service.dart';
@@ -14,6 +15,7 @@ import 'package:e_katalog/view/product/edit_product.dart';
 import 'package:e_katalog/view/product/set_product_view.dart';
 import 'package:e_katalog/view/profile/profile_view.dart';
 import 'package:e_katalog/view/welcome/welcome_view.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -23,7 +25,10 @@ import 'utils/util.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Get.putAsync(() => AppwriteService().init());
-  runApp(const MyApp());
+  runApp(DevicePreview(
+    enabled: !kReleaseMode,
+    builder: (context) => const MyApp(), // Wrap your app
+  ));
 }
 
 class MyApp extends StatelessWidget {

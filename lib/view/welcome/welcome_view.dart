@@ -69,7 +69,7 @@ class WelcomeView extends StatelessWidget {
                   isActive: true,
                   text: "Get Started",
                   onPressed: () {
-                    Get.toNamed(AppRoute.login);
+                    Get.toNamed(AppRoute.nav);
                   },
                 ),
               ),

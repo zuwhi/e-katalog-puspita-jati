@@ -135,6 +135,9 @@ class ColorsView extends StatelessWidget {
                             ),
                           )),
                     ),
+                    const SizedBox(
+                      height: 60.0,
+                    ),
                   ],
                 ),
               ),

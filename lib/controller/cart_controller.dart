@@ -1,5 +1,6 @@
 import 'package:e_katalog/constant/app_route.dart';
 import 'package:e_katalog/controller/auth_controller.dart';
+import 'package:e_katalog/controller/navigation_controller.dart';
 import 'package:e_katalog/model/cart_model.dart';
 import 'package:e_katalog/model/result.dart';
 import 'package:e_katalog/service/appwrite_service.dart';
@@ -49,7 +50,9 @@ class CartController extends GetxController {
     isloading.value = true;
     final Result result = await _appwriteService.addDataCart(cart);
     if (result.isSuccess) {
-      Get.toNamed(AppRoute.nav);
+      NavigationController controller = Get.find();
+      controller.currentView.value = 1;
+      Get.offAndToNamed(AppRoute.nav);
     } else {
       Get.snackbar(
           "Error", result.errorMessage ?? 'gagal menambahkan ke keranjang');

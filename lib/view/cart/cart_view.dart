@@ -7,6 +7,7 @@ import 'package:e_katalog/controller/auth_controller.dart';
 import 'package:e_katalog/controller/cart_controller.dart';
 import 'package:e_katalog/helper/format_rupiah.dart';
 import 'package:e_katalog/model/cart_model.dart';
+import 'package:e_katalog/view/copy/detail_product_view%20copy.dart';
 import 'package:e_katalog/view/global/button_primary.dart';
 import 'package:e_katalog/view/global/text_primary.dart';
 import 'package:flutter/material.dart';
@@ -41,6 +42,7 @@ class CartView extends StatelessWidget {
     }
 
     final AuthController authController = Get.find();
+
     return Obx(
       () => cartController.isloading.value
           ? const Scaffold(body: Center(child: CircularProgressIndicator()))
@@ -93,6 +95,9 @@ class CartView extends StatelessWidget {
                           ),
                         ],
                       ),
+                      const SizedBox(
+                        height: 60.0,
+                      ),
                     ],
                   ),
                 ),
@@ -111,20 +116,31 @@ class CartView extends StatelessWidget {
                             '+6281226965058';
                     String infoAkun =
                         "Selamat $infoWaktu, perkenalkan saya :\n \n*Nama : ${authController.userAccount.value?.name}* \n*Telepon : ${authController.userAccount.value?.telepon}* \n*Alamat : ${authController.userAccount.value?.alamat}* \n \n";
-                    final String url = "https://wa.me/$phone?text=$infoAkun"
-                        "Ingin Melakukan Finishing Pada produk : \n\n"
-                        "${cartController.listCart.value.asMap().entries.map((e) {
+
+                    // Membuat pesan untuk setiap item di keranjang
+                    String productDetails =
+                        cartController.listCart.value.asMap().entries.map((e) {
                       int index = e.key;
                       var product = e.value.product!;
                       int quantity = cartController.quantity[index];
 
                       return '*${index + 1}. ${product.title}* \n'
                           'jumlah : $quantity item\n'
-                          'warna item : ${product.color} \n'
+                          'warna item : ${product.color?.replaceAll(' ', '')} \n'
                           'biaya : ${formatRupiah(cartController.priceList[index])} \n';
-                    }).join("\n")} \n\n total biaya : ${formatRupiah(cartController.priceList.fold(0, (sum, item) => sum + item))}";
-                    if (await canLaunchUrl(Uri.parse(Uri.encodeFull(url)))) {
-                      await launchUrl(Uri.parse(Uri.encodeFull(url)));
+                    }).join("\n");
+
+                    // Menggabungkan info akun dan detail produk ke dalam satu pesan
+                    String message = "$infoAkun"
+                        "Ingin Melakukan Finishing Pada produk : \n\n"
+                        "$productDetails \n\n"
+                        "total biaya : ${formatRupiah(cartController.priceList.fold(0, (sum, item) => sum + item))}";
+
+                    final String url =
+                        "https://wa.me/$phone?text=${Uri.encodeComponent(message)}";
+
+                    if (await canLaunchUrl(Uri.parse(url))) {
+                      await launchUrl(Uri.parse(url));
                     } else {
                       throw 'Could not launch $url';
                     }
@@ -149,6 +165,12 @@ class CardProductOnCartWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    List<String> stringColors = product.color!.split(",");
+
+    List<Color> colors = stringColors
+        .map((color) => Color(int.parse(color.replaceFirst('#', '0xff'))))
+        .toList();
+
     return Column(
       children: [
         Row(
@@ -190,16 +212,23 @@ class CardProductOnCartWidget extends StatelessWidget {
                             children: [
                               TextPrimary(
                                 text: "warna : ",
-                                fontSize: 14,
-                                maxLines: 1,
+                                fontSize: 15,
                                 overflow: TextOverflow.ellipsis,
                               ),
-                              TextPrimary(
-                                text: product.product!.color ?? "",
-                                fontSize: 14,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
+                              SizedBox(
+                                height: 15,
+                                child: ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: colors.length,
+                                  scrollDirection: Axis.horizontal,
+                                  physics: const ScrollPhysics(),
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    return CircleColorWidget(
+                                        color: colors[index]);
+                                  },
+                                ),
+                              )
                             ],
                           ),
                           Obx(

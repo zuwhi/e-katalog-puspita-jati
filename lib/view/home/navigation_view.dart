@@ -30,8 +30,7 @@ class NavigationView extends StatelessWidget {
       color: Colors.white,
       child: Obx(
         () => SafeArea(
-          child: authController.isLoading.value ||
-                  authController.userAccount.value == null
+          child: authController.isLoading.value
               ? const Scaffold(
                   body: Center(child: CircularProgressIndicator()),
                 )
@@ -42,11 +41,17 @@ class NavigationView extends StatelessWidget {
                       case 0:
                         return const HomeView();
                       case 1:
-                        return authController.userAccount.value!.role == "admin"
-                            ? const ColorsView()
-                            : const CartView();
+                        return authController.isLoggedIn.value ==
+                                AuthStatus.loggedIn
+                            ? authController.userAccount.value!.role == "admin"
+                                ? const ColorsView()
+                                : const CartView()
+                            : const AboutView();
                       case 2:
-                        return const AboutView();
+                        return authController.isLoggedIn.value ==
+                                AuthStatus.loggedIn
+                            ? const AboutView()
+                            : const ProfileView();
                       case 3:
                         return const ProfileView();
 
@@ -54,37 +59,71 @@ class NavigationView extends StatelessWidget {
                         return const ProfileView();
                     }
                   }),
-                  bottomNavigationBar: Obx(
-                      () => authController.userAccount.value!.role == "admin"
-                          ? BottomNavigationBar(
-                              backgroundColor: Colors.white,
-                              items: const <BottomNavigationBarItem>[
-                                BottomNavigationBarItem(
-                                  icon: Icon(Icons.home),
-                                  label: 'Home',
-                                ),
-                                BottomNavigationBarItem(
-                                  icon: Icon(Icons.color_lens),
-                                  label: 'Colors',
-                                ),
-                                BottomNavigationBarItem(
-                                  icon: Icon(Icons.store),
-                                  label: 'about',
-                                ),
-                                BottomNavigationBarItem(
-                                  icon: Icon(Icons.person),
-                                  label: 'Profile',
-                                ),
-                              ],
-                              currentIndex: controller.currentView.value,
-                              unselectedIconTheme: const IconThemeData(
-                                color: AppColors.tertiary,
-                              ),
-                              selectedItemColor: AppColors.primary,
-                              onTap: (index) {
-                                controller.currentView.value = index;
-                              },
-                            )
+                  bottomNavigationBar: Obx(() =>
+                      authController.isLoggedIn.value == AuthStatus.loggedIn
+                          ? authController.userAccount.value!.role == "admin"
+                              ? BottomNavigationBar(
+                                  backgroundColor: Colors.white,
+                                  items: const <BottomNavigationBarItem>[
+                                    BottomNavigationBarItem(
+                                      icon: Icon(Icons.home),
+                                      label: 'Home',
+                                    ),
+                                    BottomNavigationBarItem(
+                                      icon: Icon(Icons.color_lens),
+                                      label: 'Colors',
+                                    ),
+                                    BottomNavigationBarItem(
+                                      icon: Icon(Icons.store),
+                                      label: 'about',
+                                    ),
+                                    BottomNavigationBarItem(
+                                      icon: Icon(Icons.person),
+                                      label: 'Profile',
+                                    ),
+                                  ],
+                                  currentIndex: controller.currentView.value < 4
+                                      ? controller.currentView.value
+                                      : 0,
+                                  unselectedIconTheme: const IconThemeData(
+                                    color: AppColors.tertiary,
+                                  ),
+                                  selectedItemColor: AppColors.primary,
+                                  onTap: (index) {
+                                    controller.currentView.value = index;
+                                  },
+                                )
+                              : BottomNavigationBar(
+                                  unselectedIconTheme: const IconThemeData(
+                                    color: AppColors.stroke,
+                                  ),
+                                  backgroundColor: Colors.white,
+                                  items: const <BottomNavigationBarItem>[
+                                    BottomNavigationBarItem(
+                                      icon: Icon(Icons.home),
+                                      label: 'Home',
+                                    ),
+                                    BottomNavigationBarItem(
+                                      icon: Icon(Icons.shopping_cart),
+                                      label: 'Keranjang',
+                                    ),
+                                    BottomNavigationBarItem(
+                                      icon: Icon(Icons.store),
+                                      label: 'about',
+                                    ),
+                                    BottomNavigationBarItem(
+                                      icon: Icon(Icons.person),
+                                      label: 'Profile',
+                                    ),
+                                  ],
+                                  currentIndex: controller.currentView.value < 4
+                                      ? controller.currentView.value
+                                      : 0,
+                                  selectedItemColor: AppColors.primary,
+                                  onTap: (index) {
+                                    controller.currentView.value = index;
+                                  },
+                                )
                           : BottomNavigationBar(
                               unselectedIconTheme: const IconThemeData(
                                 color: AppColors.stroke,
@@ -96,10 +135,6 @@ class NavigationView extends StatelessWidget {
                                   label: 'Home',
                                 ),
                                 BottomNavigationBarItem(
-                                  icon: Icon(Icons.shopping_cart),
-                                  label: 'Keranjang',
-                                ),
-                                BottomNavigationBarItem(
                                   icon: Icon(Icons.store),
                                   label: 'about',
                                 ),
@@ -108,7 +143,9 @@ class NavigationView extends StatelessWidget {
                                   label: 'Profile',
                                 ),
                               ],
-                              currentIndex: controller.currentView.value,
+                              currentIndex: controller.currentView.value < 3
+                                  ? controller.currentView.value
+                                  : 0,
                               selectedItemColor: AppColors.primary,
                               onTap: (index) {
                                 controller.currentView.value = index;

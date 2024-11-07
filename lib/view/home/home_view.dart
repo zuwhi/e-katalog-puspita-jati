@@ -28,8 +28,7 @@ class HomeView extends StatelessWidget {
     final ColorsController controller = Get.put(ColorsController());
     controller.getColorsList();
 
-    return authController.isLoading.value ||
-            authController.userAccount.value == null
+    return authController.isLoading.value
         ? const Center(child: CircularProgressIndicator())
         : RefreshIndicator(
             onRefresh: () async {

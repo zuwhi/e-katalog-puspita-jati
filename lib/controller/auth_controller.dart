@@ -110,7 +110,7 @@ class AuthController extends GetxController {
       await _appwriteService.logout();
       isLoggedIn.value = AuthStatus.notLoggedIn;
       userAccount.value = null;
-      Get.offAllNamed(AppRoute.login);
+      Get.offAllNamed(AppRoute.welcome);
     } catch (e) {
       Get.snackbar('Error', 'Failed to logout: $e');
     } finally {
