@@ -5,9 +5,11 @@ import 'package:e_katalog/constant/app_route.dart';
 import 'package:e_katalog/controller/about_controller.dart';
 import 'package:e_katalog/controller/auth_controller.dart';
 import 'package:e_katalog/controller/cart_controller.dart';
+import 'package:e_katalog/controller/colors_controller.dart';
 import 'package:e_katalog/controller/set_product_controller.dart';
 import 'package:e_katalog/helper/format_rupiah.dart';
 import 'package:e_katalog/model/cart_model.dart';
+import 'package:e_katalog/model/colors_model.dart';
 import 'package:e_katalog/model/product_model.dart';
 import 'package:e_katalog/view/global/button_primary.dart';
 import 'package:e_katalog/view/global/text_primary.dart';
@@ -22,9 +24,34 @@ import 'package:url_launcher/url_launcher.dart'; // import smooth page indicator
 
 class DetailProductController extends GetxController {
   RxInt currentIndex = 0.obs;
-  final selectedColor = "".obs;
+  final selectedIdColors = Rx<List<String>>([]); // Inisialisasi tanpa nullable
+  final selectedColorsName =
+      Rx<List<String>>([]); // Inisialisasi tanpa nullable
+
+  // Fungsi untuk menambahkan atau menghapus warna dari daftar pilihan
+  void toggleColor(ColorsModel color) {
+    if (selectedIdColors.value.contains(color.id)) {
+      // Jika warna sudah ada dalam daftar, hapus
+      selectedIdColors.value.remove(color.id);
+    } else {
+      if (selectedIdColors.value.length < 3) {
+        selectedIdColors.value.add(color.id ?? "");
+      }
+    }
+    if (selectedColorsName.value.contains(color.name)) {
+      selectedColorsName.value.remove(color.name);
+    } else {
+      if (selectedColorsName.value.length < 3) {
+        selectedColorsName.value.add(color.name ?? "");
+      }
+    }
+    selectedColorsName.refresh(); // Refresh untuk memicu perubahan UI
+    selectedIdColors.refresh(); // Refresh untuk memicu perubahan UI
+  }
+
   final CarouselSliderController carouselSliderController =
       CarouselSliderController();
+
   void changeIndex() {
     carouselSliderController.animateToPage(currentIndex.value);
   }
@@ -52,11 +79,7 @@ class DetailProductView extends StatelessWidget {
 
     final AuthController authController = Get.find();
 
-    List<String> stringColors = product.color!.split(",");
-
-    List<Color> colors = stringColors
-        .map((color) => Color(int.parse(color.replaceFirst('#', '0xff'))))
-        .toList();
+    final ColorsController colorsController = Get.find();
 
     String getWaktuKategori() {
       DateTime now = DateTime.now();
@@ -74,7 +97,7 @@ class DetailProductView extends StatelessWidget {
       }
     }
 
-    controller.selectedColor.value = "";
+    controller.selectedIdColors.value = [];
     return Obx(
       () => setProductController.isLoading.value
           ? const Scaffold(body: Center(child: CircularProgressIndicator()))
@@ -279,20 +302,26 @@ class DetailProductView extends StatelessWidget {
                                   height: 36,
                                   child: ListView.builder(
                                     shrinkWrap: true,
-                                    itemCount: colors.length,
+                                    itemCount: colorsController
+                                        .colorsModel.value.length,
                                     scrollDirection: Axis.horizontal,
-                                    physics: const ScrollPhysics(),
                                     itemBuilder:
                                         (BuildContext context, int index) {
+                                      ColorsModel colorModel = colorsController
+                                          .colorsModel.value[index]!;
+
                                       return Obx(
                                         () => CircleColorWidget(
                                           onTap: () {
-                                            controller.selectedColor.value =
-                                                stringColors[index];
+                                            controller.toggleColor(colorModel);
                                           },
-                                          isActive: stringColors[index] ==
-                                              controller.selectedColor.value,
-                                          color: colors[index],
+                                          isActive: controller
+                                              .selectedIdColors.value
+                                              .contains(colorModel.id!),
+                                          color: Color(
+                                            int.parse(colorModel.color!
+                                                .replaceFirst('#', '0xff')),
+                                          ),
                                         ),
                                       );
                                     },
@@ -421,9 +450,8 @@ class DetailProductView extends StatelessWidget {
                                       borderRadius: BorderRadius.circular(12)),
                                   child: InkWell(
                                     onTap: () async {
-                                      print(controller.selectedColor.value);
                                       if (controller
-                                          .selectedColor.value.isEmpty) {
+                                          .selectedIdColors.value.isEmpty) {
                                         Get.snackbar("Maaf",
                                             "Pilih warna terlebih dahulu");
                                         return;
@@ -441,7 +469,7 @@ class DetailProductView extends StatelessWidget {
                                         String message = "$infoAkun"
                                             "Ingin Melakukan Finishing Pada produk : \n\n"
                                             "Nama item : ${product.title} \n"
-                                            "Kode warna :${controller.selectedColor.value.replaceAll(" ", "")} \n"
+                                            "Warna : ${controller.selectedColorsName.value.join(", ")} \n"
                                             "Biaya : ${formatRupiah(product.price)} \n";
 
                                         final String url =
@@ -471,7 +499,7 @@ class DetailProductView extends StatelessWidget {
                                     text: "Tambah ke keranjang",
                                     onPressed: () async {
                                       if (controller
-                                          .selectedColor.value.isEmpty) {
+                                          .selectedIdColors.value.isEmpty) {
                                         Get.snackbar("Maaf",
                                             "Pilih warna terlebih dahulu");
                                         return;
@@ -480,10 +508,11 @@ class DetailProductView extends StatelessWidget {
                                           userId: authController
                                               .userAccount.value!.id
                                               .toString(),
-                                          color: controller.selectedColor.value,
+                                          colors:
+                                              controller.selectedIdColors.value,
                                           product: product,
                                         );
-
+                                       
                                         cartController.addDataCart(cart);
                                       }
                                     },
@@ -497,13 +526,12 @@ class DetailProductView extends StatelessWidget {
                       padding: const EdgeInsets.all(18.0),
                       child: Container(
                           height: 60,
-                          margin: const EdgeInsets.only(right: 15),
                           decoration: BoxDecoration(
                               color: AppColors.secoondarybuttton,
                               borderRadius: BorderRadius.circular(12)),
                           child: InkWell(
                             onTap: () async {
-                              if (controller.selectedColor.value.isEmpty) {
+                              if (controller.selectedIdColors.value.isEmpty) {
                                 Get.snackbar(
                                     "Maaf", "Pilih warna terlebih dahulu");
                                 return;
@@ -518,7 +546,7 @@ class DetailProductView extends StatelessWidget {
                                 String message = "$infoAkun"
                                     "Saya ingin Melakukan Finishing Pada produk : \n\n"
                                     "Nama item : ${product.title} \n"
-                                    "Kode warna :${controller.selectedColor.value.replaceAll(" ", "")} \n"
+                                    "Warna: ${controller.selectedColorsName.value.join(", ")} \n"
                                     "Biaya : ${formatRupiah(product.price)} \n";
 
                                 final String url =
@@ -571,8 +599,8 @@ class CircleColorWidget extends StatelessWidget {
       onTap: onTap,
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 4),
-        width: 36,
-        height: 36,
+        width: 40,
+        height: 40,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: color, // Warna lingkaran bagian dalam

@@ -6,7 +6,7 @@ import 'package:logger/logger.dart';
 
 class ColorsController extends GetxController {
   final AppwriteService _appwriteService = Get.find<AppwriteService>();
-  final colorsModel = Rx<ColorsModel?>(null);
+  final colorsModel = Rx<List<ColorsModel?>>([]);
   var selectedColors = <String>[].obs;
   RxBool isLoading = false.obs;
 
@@ -27,7 +27,31 @@ class ColorsController extends GetxController {
 
     final result = await _appwriteService.getColorsList();
     if (result.isSuccess) {
-      colorsModel.value = ColorsModel.fromMap(result.resultValue);
+      colorsModel.value = result.resultValue;
+    } else {
+      Get.snackbar("Terjadi kesalahan", "periksa koneksi anda");
+    }
+    isLoading.value = false;
+  }
+
+  Future<void> addColorToList(ColorsModel colors) async {
+    isLoading.value = true;
+    final result = await _appwriteService.addColors(colors);
+    if (result.isSuccess) {
+      await getColorsList();
+      Get.snackbar("Success", "Berhasil menambahkan warna");
+    } else {
+      Get.snackbar("Terjadi kesalahan", "periksa koneksi anda");
+    }
+    isLoading.value = false;
+  }
+
+  Future<void> deleteColor(ColorsModel colors) async {
+    isLoading.value = true;
+    final result = await _appwriteService.deleteColor(colors.id ?? "");
+    if (result.isSuccess) {
+      await getColorsList();
+      Get.snackbar("Success", "Berhasil menghapus warna");
     } else {
       Get.snackbar("Terjadi kesalahan", "periksa koneksi anda");
     }
@@ -38,14 +62,14 @@ class ColorsController extends GetxController {
     isLoading.value = true;
     print(selectedColors);
     Logger().d(selectedColors);
-    final result = await _appwriteService.updateColors(
-        colorsModel.value!.id ?? "", selectedColors.join(", "));
-    if (result.isSuccess) {
-      await getColorsList();
-      Get.snackbar("Success", "Berhasil mengubah warna");
-    } else {
-      Get.snackbar("Terjadi kesalahan", "periksa koneksi anda");
-    }
+    // final result = await _appwriteService.updateColors(
+    //     colorsModel.value!.id ?? "", selectedColors.join(", "));
+    // if (result.isSuccess) {
+    //   await getColorsList();
+    //   Get.snackbar("Success", "Berhasil mengubah warna");
+    // } else {
+    //   Get.snackbar("Terjadi kesalahan", "periksa koneksi anda");
+    // }
     isLoading.value = false;
   }
 }

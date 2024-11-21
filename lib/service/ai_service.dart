@@ -4,21 +4,22 @@ class AIService {
   final Dio _dio = Dio();
 
   Future<String?> sendRequest(String prompt) async {
-    String url = 'https://mr-apis.com/api/ai/geminitext';
+    String url = 'https://apidl.asepharyana.cloud/api/ai/gemini';
 
     try {
       final Response response = await _dio.get(
         url,
-        queryParameters: {'prompt': prompt},
+        queryParameters: {'text': prompt},
         options: Options(
           headers: {
             'accept': 'application/json',
           },
         ),
       );
-
-      return response.data['message'];
+  
+      return response.data['answer'];
     } catch (e) {
+     
       rethrow;
     }
   }

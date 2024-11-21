@@ -15,6 +15,8 @@ class CartController extends GetxController {
 
   RxInt totalHarga = 0.obs;
 
+  
+
   @override
   void onInit() {
     super.onInit();

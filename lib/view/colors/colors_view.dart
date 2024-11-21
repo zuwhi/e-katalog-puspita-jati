@@ -2,8 +2,9 @@
 
 import 'package:e_katalog/constant/app_colors.dart';
 import 'package:e_katalog/controller/colors_controller.dart';
-import 'package:e_katalog/view/global/button_primary.dart';
+import 'package:e_katalog/model/colors_model.dart';
 import 'package:e_katalog/view/global/text_gelasio.dart';
+import 'package:e_katalog/view/global/text_primary.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:get/get.dart';
@@ -14,8 +15,8 @@ class ColorsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ColorsController controller = Get.find();
-    controller.selectedColors.value =
-        controller.colorsModel.value?.colors.split(",") ?? [];
+
+    TextEditingController nameController = TextEditingController();
 
     return Scaffold(
       appBar: AppBar(
@@ -62,21 +63,65 @@ class ColorsView extends StatelessWidget {
                                   builder: (BuildContext context) {
                                     Color pickerColor = Colors.blue;
                                     return AlertDialog(
-                                      title: const Text('Pilih Warna'),
                                       content: SingleChildScrollView(
-                                        child: ColorPicker(
-                                          pickerColor: pickerColor,
-                                          onColorChanged: (Color color) {
-                                            pickerColor = color;
-                                          },
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            TextPrimary(
+                                              text: "Nama warna",
+                                              fontSize: 18.0,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                            const SizedBox(
+                                              height: 4.0,
+                                            ),
+                                            TextFormField(
+                                              controller: nameController,
+                                              keyboardType: TextInputType.text,
+                                              decoration: InputDecoration(
+                                                hintText: "contoh : coklat tua",
+                                                hintStyle: const TextStyle(
+                                                    color: AppColors.secondary),
+                                                border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                  borderSide: const BorderSide(
+                                                      color: Colors.black),
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(
+                                              height: 15.0,
+                                            ),
+                                            ColorPicker(
+                                              pickerColor: pickerColor,
+                                              onColorChanged: (Color color) {
+                                                pickerColor = color;
+                                              },
+                                            ),
+                                          ],
                                         ),
                                       ),
                                       actions: <Widget>[
                                         TextButton(
-                                          child: const Text('Pilih'),
+                                          child: const Text('Tambah warna'),
                                           onPressed: () {
-                                            controller.addColor(pickerColor);
-                                            Navigator.of(context).pop();
+                                            if (nameController.text.isEmpty) {
+                                              // Menampilkan pesan peringatan jika `nameController` kosong
+                                              Get.snackbar("Gagal menambahkan",
+                                                  "nama warna tidak boleh kosong");
+                                            } else {
+                                              final colorsModel = ColorsModel(
+                                                name: nameController.text,
+                                                color: controller
+                                                    .colorToHex(pickerColor),
+                                              );
+
+                                              controller
+                                                  .addColorToList(colorsModel);
+                                              Navigator.of(context).pop();
+                                            }
                                           },
                                         ),
                                       ],
@@ -97,43 +142,54 @@ class ColorsView extends StatelessWidget {
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(5),
                           color: AppColors.disable),
-                      child: Obx(() => Column(
-                            children: List.generate(
-                              controller.selectedColors.length,
-                              (index) {
-                                final colorHex =
-                                    controller.selectedColors[index];
-                                final color = Color(int.parse(
-                                    colorHex.replaceFirst('#', '0xff')));
+                      child: Obx(
+                        () => ListView.builder(
+                          itemCount: controller.colorsModel.value.length,
+                          shrinkWrap: true,
+                          physics: const ScrollPhysics(),
+                          itemBuilder: (BuildContext context, int index) {
+                            List<ColorsModel?> colors =
+                                controller.colorsModel.value;
 
-                                final textColor = color == Colors.white
-                                    ? Colors.grey
-                                    : Colors.white;
+                            final colorHex = colors[index];
+                            final color = Color(int.parse(
+                                colorHex!.color!.replaceFirst('#', '0xff')));
 
-                                return Card(
-                                  color: color,
-                                  child: ListTile(
-                                    title: Text(
-                                      colorHex,
-                                      style: TextStyle(
-                                        color: textColor,
-                                        fontWeight: FontWeight.bold,
-                                        letterSpacing: 1.5,
-                                      ),
-                                    ),
-                                    trailing: IconButton(
-                                      icon: const Icon(
-                                        Icons.close,
-                                        color: Colors.red,
-                                      ),
-                                      onPressed: () =>
-                                          controller.removeColor(index),
-                                    ),
+                            final textColor = color == Colors.white
+                                ? Colors.grey
+                                : Colors.white;
+                            return Card(
+                              color: color,
+                              child: ListTile(
+                                title: Text(
+                                  colorHex.name!,
+                                  style: TextStyle(
+                                    color: textColor,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 1.5,
                                   ),
-                                );
-                              },
-                            ),
-                          )),
+                                ),
+                                subtitle: Text(
+                                  colorHex.color!,
+                                  style: TextStyle(
+                                    color: textColor,
+                                    fontWeight: FontWeight.w500,
+                                    letterSpacing: 1.5,
+                                  ),
+                                ),
+                                trailing: IconButton(
+                                  icon: Icon(
+                                    Icons.delete,
+                                    color: textColor,
+                                  ),
+                                  onPressed: () =>
+                                      controller.deleteColor(colors[index]!),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
                     ),
                     const SizedBox(
                       height: 60.0,
@@ -142,16 +198,6 @@ class ColorsView extends StatelessWidget {
                 ),
               ),
             )),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 18.0, horizontal: 30),
-          child: ButtonPrimary(
-              isActive: true,
-              backgroundColor: AppColors.primary,
-              text: "Simpan Perubahan",
-              onPressed: () async {
-                controller.updateColor();
-              })),
     );
   }
 }

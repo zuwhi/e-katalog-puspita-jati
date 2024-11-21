@@ -264,17 +264,20 @@ class ProfileView extends StatelessWidget {
                         TextPrimary(
                           text: "Anda Belum Login ",
                           fontSize: 20.0,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primary,
+                          fontWeight: FontWeight.w400,
+                          color: AppColors.secondary,
+                        ),
+                        const SizedBox(
+                          height: 5.0,
                         ),
                         TextPrimary(
                           text: "Silahkan Login terlebih dahulu ",
                           fontSize: 20.0,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w400,
                           color: AppColors.secondary,
                         ),
                         const SizedBox(
-                          height: 20.0,
+                          height: 40.0,
                         ),
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
@@ -290,7 +293,10 @@ class ProfileView extends StatelessWidget {
                           onPressed: () {
                             Get.toNamed(AppRoute.login);
                           },
-                          child: const Text("LOGIN"),
+                          child: const Text(
+                            "LOGIN",
+                            style: TextStyle(color: AppColors.primary),
+                          ),
                         )
                       ],
                     ),

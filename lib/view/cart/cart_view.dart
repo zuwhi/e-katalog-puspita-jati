@@ -7,7 +7,6 @@ import 'package:e_katalog/controller/auth_controller.dart';
 import 'package:e_katalog/controller/cart_controller.dart';
 import 'package:e_katalog/helper/format_rupiah.dart';
 import 'package:e_katalog/model/cart_model.dart';
-import 'package:e_katalog/view/copy/detail_product_view%20copy.dart';
 import 'package:e_katalog/view/global/button_primary.dart';
 import 'package:e_katalog/view/global/text_primary.dart';
 import 'package:flutter/material.dart';
@@ -50,6 +49,7 @@ class CartView extends StatelessWidget {
               appBar: AppBar(
                 backgroundColor: Colors.white,
                 title: const Text("Cart View"),
+                leading: Container(),
                 centerTitle: true,
               ),
               body: SingleChildScrollView(
@@ -66,6 +66,7 @@ class CartView extends StatelessWidget {
                           itemBuilder: (BuildContext context, int index) {
                             CartModel product =
                                 cartController.listCart.value[index];
+
                             return CardProductOnCartWidget(
                                 controller: cartController,
                                 product: product,
@@ -123,10 +124,15 @@ class CartView extends StatelessWidget {
                       int index = e.key;
                       var product = e.value.product!;
                       int quantity = cartController.quantity[index];
+                      List<dynamic> colors = e.value.colors!;
+
+                      // Mendapatkan semua nama warna dan menggabungkannya dengan koma
+                      String colorNames =
+                          colors.map((color) => color["name"]).join(", ");
 
                       return '*${index + 1}. ${product.title}* \n'
                           'jumlah : $quantity item\n'
-                          'warna item : ${product.color?.replaceAll(' ', '')} \n'
+                          'warna item : $colorNames \n'
                           'biaya : ${formatRupiah(cartController.priceList[index])} \n';
                     }).join("\n");
 
@@ -165,12 +171,6 @@ class CardProductOnCartWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<String> stringColors = product.color!.split(",");
-
-    List<Color> colors = stringColors
-        .map((color) => Color(int.parse(color.replaceFirst('#', '0xff'))))
-        .toList();
-
     return Column(
       children: [
         Row(
@@ -219,13 +219,16 @@ class CardProductOnCartWidget extends StatelessWidget {
                                 height: 15,
                                 child: ListView.builder(
                                   shrinkWrap: true,
-                                  itemCount: colors.length,
+                                  itemCount: product.colors!.length,
                                   scrollDirection: Axis.horizontal,
                                   physics: const ScrollPhysics(),
                                   itemBuilder:
                                       (BuildContext context, int index) {
-                                    return CircleColorWidget(
-                                        color: colors[index]);
+                                    return CircleColorWidgetOnCart(
+                                      color: Color(int.parse(product
+                                          .colors![index]["color"]
+                                          .replaceFirst('#', '0xff'))),
+                                    );
                                   },
                                 ),
                               )
@@ -384,6 +387,34 @@ class CardProductOnCartWidget extends StatelessWidget {
           height: 15.0,
         ),
       ],
+    );
+  }
+}
+
+class CircleColorWidgetOnCart extends StatelessWidget {
+  const CircleColorWidgetOnCart(
+      {super.key, this.color, this.onTap, this.isActive = false});
+  final void Function()? onTap;
+  final Color? color;
+  final bool isActive;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+          width: 20,
+          height: 20,
+          decoration:
+              BoxDecoration(shape: BoxShape.circle, color: color, boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              spreadRadius: 1,
+              blurRadius: 3,
+              offset: const Offset(0, 1),
+            )
+          ]),
+          child: Container()),
     );
   }
 }

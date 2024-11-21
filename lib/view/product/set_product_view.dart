@@ -2,7 +2,6 @@
 
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:e_katalog/constant/app_colors.dart';
-import 'package:e_katalog/controller/colors_controller.dart';
 import 'package:e_katalog/controller/set_product_controller.dart';
 import 'package:e_katalog/view/global/button_primary.dart';
 import 'package:e_katalog/view/global/text_form_primary.dart';
@@ -19,10 +18,6 @@ class SetProductView extends StatelessWidget {
   Widget build(BuildContext context) {
     final SetProductController setProductController =
         Get.put(SetProductController());
-
-    final ColorsController colorsController = Get.find();
-    setProductController.availableColors.value =
-        colorsController.colorsModel.value!.colors.split(",");
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -119,7 +114,6 @@ class SetProductView extends StatelessWidget {
                     const SizedBox(
                       height: 15.0,
                     ),
-                    MultiColorPickerWidget(controller: setProductController)
                   ],
                 );
               }),
@@ -234,7 +228,6 @@ class SetProductView extends StatelessWidget {
                             "" &&
                         setProductController.productEstimatedController.text !=
                             "" &&
-                        setProductController.selectedColors.isNotEmpty &&
                         setProductController.imageFiles[0] != null &&
                         setProductController.imageFiles[1] != null &&
                         setProductController.imageFiles[2] != null,
@@ -275,17 +268,18 @@ class MultiColorPickerWidget extends StatelessWidget {
               mainAxisSpacing: 8,
               childAspectRatio: 1,
             ),
-            itemCount: controller.availableColors.length,
+            itemCount: controller.availableColors.value.length,
             itemBuilder: (context, index) {
-              final colorHex = controller.availableColors[index];
+              final colorHex = controller.availableColors.value[index];
               final color =
-                  Color(int.parse(colorHex.replaceFirst('#', '0xff')));
+                  Color(int.parse(colorHex!.color!.replaceFirst('#', '0xff')));
 
               return GestureDetector(
                 onTap: () => controller.toggleColor(colorHex),
                 child: Obx(() {
                   final isSelected =
-                      controller.selectedColors.contains(colorHex);
+                      controller.selectedColors.value.contains(colorHex);
+
                   return Container(
                     decoration: BoxDecoration(
                       color: color,

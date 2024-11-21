@@ -33,7 +33,6 @@ class EditProductController extends GetxController {
   RxString bucket2 = "".obs;
   RxString bucket3 = "".obs;
 
-  
   var selectedColors = <String>[].obs;
 
   var availableColors = <String>[].obs;
@@ -56,7 +55,7 @@ class EditProductController extends GetxController {
     imageFiles[0] = product.image1;
     imageFiles[1] = product.image2;
     imageFiles[2] = product.image3;
-    selectedColors.value = product.color!.split(", ");
+
     selectedCategory.value = product.category;
     bucket1.value = product.bucket1 ?? "";
     bucket2.value = product.bucket2 ?? "";
@@ -113,7 +112,6 @@ class EditProductController extends GetxController {
       isLoading.value = true;
       await _appwriteService.deleteProduct(documentId);
       Get.offAllNamed(AppRoute.nav);
-
     } catch (e) {
       rethrow;
     } finally {
@@ -136,7 +134,6 @@ class EditProductController extends GetxController {
   void removeImage(int index) {
     imageFiles[index] = null;
   }
-
 
   final List<String> colors = [
     "coklat",

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:e_katalog/constant/app_route.dart';
+import 'package:e_katalog/model/colors_model.dart';
 import 'package:e_katalog/model/product_image_model.dart';
 import 'package:e_katalog/model/product_model.dart';
 import 'package:e_katalog/service/ai_service.dart';
@@ -42,35 +43,33 @@ class SetProductController extends GetxController {
   }
 
   Future<void> addProduct() async {
-    try {
-      isLoading.value = true;
-      ProductModel productModel = ProductModel(
-        id: "",
-        title: productNameController.text,
-        desc: productDescriptionController.text,
-        price: int.parse(productPriceController.text),
-        date: DateFormat('yyyy-MM-dd').format(DateTime.now()),
-        category: selectedCategory.value,
-        color: selectedColors.join(", "),
-        estimate: productEstimatedController.text,
-      );
-      ProductImageModel productImageModel = ProductImageModel(
-        image1: imageFiles[0],
-        image2: imageFiles[1],
-        image3: imageFiles[2],
-      );
-      bool result =
-          await _appwriteService.addProduct(productModel, productImageModel);
-      if (result) {
-        Get.snackbar("success", "product berhasil ditambahkan :)");
-        dispose();
-        Get.offAllNamed(AppRoute.nav);
-      }
-    } catch (e) {
-      Get.snackbar("terjadi kesalahan", e.toString());
-    } finally {
+    isLoading.value = true;
+    ProductModel productModel = ProductModel(
+      id: "",
+      title: productNameController.text,
+      desc: productDescriptionController.text,
+      price: int.parse(productPriceController.text),
+      date: DateFormat('yyyy-MM-dd').format(DateTime.now()),
+      category: selectedCategory.value,
+      estimate: productEstimatedController.text,
+    );
+    ProductImageModel productImageModel = ProductImageModel(
+      image1: imageFiles[0],
+      image2: imageFiles[1],
+      image3: imageFiles[2],
+    );
+    final result =
+        await _appwriteService.addProduct(productModel, productImageModel);
+    if (result.isSuccess) {
+      Get.snackbar("success", "product berhasil ditambahkan :)");
+      dispose();
+      Get.offAllNamed(AppRoute.nav);
+    } else {
+      Get.snackbar("terjadi kesalahan", "product gagal ditambahkan :(");
       isLoading.value = false;
     }
+
+    isLoading.value = false;
   }
 
   Future<void> deleteProduct(String documentId) async {
@@ -114,27 +113,19 @@ class SetProductController extends GetxController {
     imageFiles[index] = null;
   }
 
-  var selectedColors = <String>[].obs;
+  var selectedColors = Rx<List<ColorsModel?>>([]);
 
-  var availableColors = <String>[].obs;
+  var availableColors = Rx<List<ColorsModel?>>([]);
 
   // Fungsi untuk menambahkan atau menghapus warna dari daftar pilihan
-  void toggleColor(String color) {
-    if (selectedColors.contains(color)) {
-      selectedColors.remove(color);
+  void toggleColor(ColorsModel color) {
+    if (selectedColors.value.contains(color)) {
+      selectedColors.value.remove(color);
     } else {
-      selectedColors.add(color);
-   
+      selectedColors.value.add(color);
     }
+    selectedColors.refresh();
   }
-
-  final List<String> colors = [
-    "coklat",
-    "silver",
-    "emas",
-    "hitam",
-    "putih",
-  ];
 
   final List<String> categories = [
     "all",

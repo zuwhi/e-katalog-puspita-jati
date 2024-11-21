@@ -6,6 +6,7 @@ import 'package:e_katalog/constant/app_route.dart';
 import 'package:e_katalog/constant/appwrite_constants.dart';
 import 'package:e_katalog/model/about_model.dart';
 import 'package:e_katalog/model/cart_model.dart';
+import 'package:e_katalog/model/colors_model.dart';
 import 'package:e_katalog/model/product_image_model.dart';
 import 'package:e_katalog/model/product_model.dart';
 import 'package:e_katalog/model/result.dart';
@@ -42,6 +43,32 @@ class AppwriteService extends GetxService {
     }
   }
 
+  Future<Result> addColors(ColorsModel colors) async {
+    try {
+      await databases.createDocument(
+          databaseId: AppwriteConstants.databaseId,
+          collectionId: AppwriteConstants.colorsCollectionID,
+          documentId: ID.unique(),
+          data: {"color": colors.color, "name": colors.name});
+      return const Result.success("success");
+    } catch (e) {
+      return Result.failed(e.toString());
+    }
+  }
+
+  Future<Result> deleteColor(String id) async {
+    try {
+      await databases.deleteDocument(
+          databaseId: AppwriteConstants.databaseId,
+          collectionId: AppwriteConstants.colorsCollectionID,
+          documentId: id);
+      return const Result.success("success");
+    } catch (e) {
+      print(e);
+      return Result.failed(e.toString());
+    }
+  }
+
   Future<Result> updateAboutDesc(AboutModel? aboutModel) async {
     try {
       await databases.updateDocument(
@@ -63,26 +90,15 @@ class AppwriteService extends GetxService {
     }
   }
 
-  Future<Result> updateColors(String colorsId, String colors) async {
-    try {
-      await databases.updateDocument(
-          databaseId: AppwriteConstants.databaseId,
-          collectionId: AppwriteConstants.colorsCollectionID,
-          documentId: colorsId,
-          data: {"colors": colors});
-      return const Result.success("success");
-    } catch (e) {
-      return Result.failed(e.toString());
-    }
-  }
-
   Future<Result> getColorsList() async {
     try {
       final result = await databases.listDocuments(
           databaseId: AppwriteConstants.databaseId,
           collectionId: AppwriteConstants.colorsCollectionID);
       Logger().d(result);
-      return Result.success(result.documents[0].data);
+      List<ColorsModel> colors =
+          result.documents.map((e) => ColorsModel.fromMap(e.data)).toList();
+      return Result.success(colors);
     } catch (e) {
       Logger().d(e);
       return Result.failed(e.toString());
@@ -98,7 +114,7 @@ class AppwriteService extends GetxService {
           data: {
             "userId": cart.userId,
             "product": cart.product!.id,
-            "color": cart.color,
+            "colors": cart.colors,
           });
 
       return const Result.success(true);
@@ -354,7 +370,7 @@ class AppwriteService extends GetxService {
     }
   }
 
-  Future<bool> addProduct(
+  Future<Result> addProduct(
       ProductModel product, ProductImageModel productImages) async {
     try {
       List<String?> list1 = await uploadImage(productImages.image1);
@@ -370,7 +386,6 @@ class AppwriteService extends GetxService {
           "desc": product.desc,
           "price": product.price,
           "estimate": product.estimate,
-          "color": product.color,
           "image1": list1[1],
           "image2": list2[1],
           "image3": list3[1],
@@ -382,13 +397,11 @@ class AppwriteService extends GetxService {
         },
       );
 
-      print(result);
-      print("berhasil");
-
-      return true;
+      return const Result.success(true);
     } on AppwriteException catch (e) {
+      print(e);
       Logger().d(e.message);
-      return false;
+      return Result.failed(e.message ?? 'terjadi kesalahan menambahkan produk');
     }
   }
 
