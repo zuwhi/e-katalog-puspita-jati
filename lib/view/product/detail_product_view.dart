@@ -27,7 +27,7 @@ class DetailProductController extends GetxController {
   final selectedIdColors = Rx<List<String>>([]); // Inisialisasi tanpa nullable
   final selectedColorsName =
       Rx<List<String>>([]); // Inisialisasi tanpa nullable
-
+  RxString errorMessage = ''.obs;
   // Fungsi untuk menambahkan atau menghapus warna dari daftar pilihan
   void toggleColor(ColorsModel color) {
     if (selectedIdColors.value.contains(color.id)) {
@@ -334,253 +334,286 @@ class DetailProductView extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(
-                      height: 100.0,
+                      height: 10.0,
+                    ),
+                    Obx(
+                      () => controller.errorMessage.value.isNotEmpty
+                          ? Center(
+                              child: Text(
+                                controller.errorMessage.value,
+                                style: const TextStyle(color: Colors.red),
+                              ),
+                            )
+                          : const SizedBox(
+                              height: 5,
+                            ),
+                    ),
+                    const SizedBox(
+                      height: 5.0,
+                    ),
+                    authController.isLoggedIn.value == AuthStatus.loggedIn
+                        ? authController.userAccount.value!.role == "admin"
+                            ? Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 18.0),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                        margin:
+                                            const EdgeInsets.only(right: 15),
+                                        height: 60,
+                                        width: 100,
+                                        child:
+                                            ButtonDelete(onPressed: () async {
+                                          Get.dialog(Dialog(
+                                            backgroundColor: Colors.white,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(14.0),
+                                            ),
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(20.0),
+                                              child: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  const SizedBox(
+                                                    height: 10.0,
+                                                  ),
+                                                  const Text(
+                                                    "Konfirmasi",
+                                                    style: TextStyle(
+                                                      fontSize: 18,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 16),
+                                                  const Text(
+                                                    "Apakah Anda yakin ingin menghapus item ini?",
+                                                  ),
+                                                  const SizedBox(height: 24),
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.end,
+                                                    children: [
+                                                      SizedBox(
+                                                        width: 100,
+                                                        child: TextButton(
+                                                          onPressed: () {
+                                                            Navigator.pop(
+                                                                context);
+                                                          },
+                                                          child: TextPrimary(
+                                                            text: "Batal",
+                                                            color: AppColors
+                                                                .primary,
+                                                            fontSize: 18.0,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      SizedBox(
+                                                        width: 100,
+                                                        child: ButtonPrimary(
+                                                          text: "Hapus",
+                                                          onPressed: () async {
+                                                            await setProductController
+                                                                .deleteProduct(
+                                                                    product.id);
+                                                            Get.back();
+                                                            Get.back();
+                                                          },
+                                                          isActive: true,
+                                                          backgroundColor:
+                                                              Colors.red,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ));
+                                        })),
+                                    Expanded(
+                                      child: SizedBox(
+                                        height: 60,
+                                        child: ButtonPrimary(
+                                          backgroundColor: AppColors.primary,
+                                          isActive: true,
+                                          text: "Edit Item",
+                                          onPressed: () async {
+                                            Get.toNamed(AppRoute.editProduct,
+                                                arguments: {
+                                                  "product": product
+                                                });
+                                          },
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              )
+                            : Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 18.0),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                        margin:
+                                            const EdgeInsets.only(right: 15),
+                                        height: 60,
+                                        width: 100,
+                                        decoration: BoxDecoration(
+                                            color: AppColors.secoondarybuttton,
+                                            borderRadius:
+                                                BorderRadius.circular(12)),
+                                        child: InkWell(
+                                          onTap: () async {
+                                            if (controller.selectedIdColors
+                                                .value.isEmpty) {
+                                              controller.errorMessage.value =
+                                                  "Maaf, pilih warna terlebih dahulu";
+                                              return;
+                                            } else {
+                                              controller.errorMessage.value =
+                                                  "";
+                                              String infoWaktu =
+                                                  getWaktuKategori();
+                                              String phone = aboutController
+                                                      .aboutModelDesc
+                                                      .value!
+                                                      .telepon ??
+                                                  '+62895321505858';
+                                              String infoAkun =
+                                                  "Selamat $infoWaktu, perkenalkan saya :\n \n*Nama : ${authController.userAccount.value?.name}* \n*Telepon : ${authController.userAccount.value?.telepon}* \n*Alamat : ${authController.userAccount.value?.alamat}* \n \n";
+
+                                              String message = "$infoAkun"
+                                                  "Ingin Melakukan Finishing Pada produk : \n\n"
+                                                  "Nama item : ${product.title} \n"
+                                                  "Warna : ${controller.selectedColorsName.value.join(", ")} \n"
+                                                  "Biaya : ${formatRupiah(product.price)} \n";
+
+                                              final String url =
+                                                  "https://wa.me/$phone?text=${Uri.encodeComponent(message)}";
+
+                                              if (await canLaunchUrl(
+                                                  Uri.parse(url))) {
+                                                await launchUrl(Uri.parse(url));
+                                              } else {
+                                                Get.snackbar(
+                                                    "Terjadi kesalahan",
+                                                    "tidak ditemukan whatsapp, Mohon install WhatsApp terlebih dahulu");
+                                              }
+                                            }
+                                          },
+                                          child: Center(
+                                              child: SvgPicture.asset(
+                                            "assets/images/wa.svg",
+                                            width: 40,
+                                            height: 40,
+                                          )),
+                                        )),
+                                    Expanded(
+                                      child: SizedBox(
+                                        height: 60,
+                                        child: ButtonPrimary(
+                                          backgroundColor: AppColors.primary,
+                                          isActive: true,
+                                          text: "Tambah ke keranjang",
+                                          onPressed: () async {
+                                            if (controller.selectedIdColors
+                                                .value.isEmpty) {
+                                              controller.errorMessage.value =
+                                                  "Maaf, pilih warna terlebih dahulu";
+                                              return;
+                                            } else {
+                                              controller.errorMessage.value =
+                                                  "";
+                                              CartModel cart = CartModel(
+                                                userId: authController
+                                                    .userAccount.value!.id
+                                                    .toString(),
+                                                colors: controller
+                                                    .selectedIdColors.value,
+                                                product: product,
+                                              );
+
+                                              cartController.addDataCart(cart);
+                                            }
+                                          },
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              )
+                        : Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 18.0),
+                            child: Container(
+                                height: 60,
+                                decoration: BoxDecoration(
+                                    color: AppColors.secoondarybuttton,
+                                    borderRadius: BorderRadius.circular(12)),
+                                child: InkWell(
+                                  onTap: () async {
+                                    if (controller
+                                        .selectedIdColors.value.isEmpty) {
+                                      controller.errorMessage.value =
+                                          "Maaf, pilih warna terlebih dahulu";
+
+                                      return;
+                                    } else {
+                                      controller.errorMessage.value = "";
+                                      String infoWaktu = getWaktuKategori();
+
+                                      String phone = aboutController
+                                              .aboutModelDesc.value!.telepon ??
+                                          '+62895321505858';
+                                      String infoAkun = "Selamat $infoWaktu, ";
+
+                                      String message = "$infoAkun"
+                                          "Saya ingin Melakukan Finishing Pada produk : \n\n"
+                                          "Nama item : ${product.title} \n"
+                                          "Warna: ${controller.selectedColorsName.value.join(", ")} \n"
+                                          "Biaya : ${formatRupiah(product.price)} \n";
+
+                                      final String url =
+                                          "https://wa.me/$phone?text=${Uri.encodeComponent(message)}";
+
+                                      if (await canLaunchUrl(Uri.parse(url))) {
+                                        await launchUrl(Uri.parse(url));
+                                      } else {
+                                        Get.snackbar("Terjadi kesalahan",
+                                            "tidak ditemukan whatsapp, Mohon install WhatsApp terlebih dahulu");
+                                      }
+                                    }
+                                  },
+                                  child: Center(
+                                      child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      TextPrimary(
+                                        text: "Pesan Sekarang",
+                                        color: AppColors.primary,
+                                        fontSize: 18.0,
+                                        fontWeight: FontWeight.w500,
+                                      )
+                                    ],
+                                  )),
+                                )),
+                          ),
+                    const SizedBox(
+                      height: 18.0,
                     ),
                   ],
                 ),
               ),
               floatingActionButtonLocation:
                   FloatingActionButtonLocation.centerDocked,
-              floatingActionButton: authController.isLoggedIn.value ==
-                      AuthStatus.loggedIn
-                  ? authController.userAccount.value!.role == "admin"
-                      ? Padding(
-                          padding: const EdgeInsets.all(18.0),
-                          child: Row(
-                            children: [
-                              Container(
-                                  margin: const EdgeInsets.only(right: 15),
-                                  height: 60,
-                                  width: 100,
-                                  child: ButtonDelete(onPressed: () async {
-                                    Get.dialog(Dialog(
-                                      backgroundColor: Colors.white,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(14.0),
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(20.0),
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            const SizedBox(
-                                              height: 10.0,
-                                            ),
-                                            const Text(
-                                              "Konfirmasi",
-                                              style: TextStyle(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 16),
-                                            const Text(
-                                              "Apakah Anda yakin ingin menghapus item ini?",
-                                            ),
-                                            const SizedBox(height: 24),
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.end,
-                                              children: [
-                                                SizedBox(
-                                                  width: 100,
-                                                  child: TextButton(
-                                                    onPressed: () {
-                                                      Navigator.pop(context);
-                                                    },
-                                                    child: TextPrimary(
-                                                      text: "Batal",
-                                                      color: AppColors.primary,
-                                                      fontSize: 18.0,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                  width: 100,
-                                                  child: ButtonPrimary(
-                                                    text: "Hapus",
-                                                    onPressed: () async {
-                                                      await setProductController
-                                                          .deleteProduct(
-                                                              product.id);
-                                                      Get.back();
-                                                      Get.back();
-                                                    },
-                                                    isActive: true,
-                                                    backgroundColor: Colors.red,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ));
-                                  })),
-                              Expanded(
-                                child: SizedBox(
-                                  height: 60,
-                                  child: ButtonPrimary(
-                                    backgroundColor: AppColors.primary,
-                                    isActive: true,
-                                    text: "Edit Item",
-                                    onPressed: () async {
-                                      Get.toNamed(AppRoute.editProduct,
-                                          arguments: {"product": product});
-                                    },
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                        )
-                      : Padding(
-                          padding: const EdgeInsets.all(18.0),
-                          child: Row(
-                            children: [
-                              Container(
-                                  margin: const EdgeInsets.only(right: 15),
-                                  height: 60,
-                                  width: 100,
-                                  decoration: BoxDecoration(
-                                      color: AppColors.secoondarybuttton,
-                                      borderRadius: BorderRadius.circular(12)),
-                                  child: InkWell(
-                                    onTap: () async {
-                                      if (controller
-                                          .selectedIdColors.value.isEmpty) {
-                                        Get.snackbar("Maaf",
-                                            "Pilih warna terlebih dahulu");
-                                        return;
-                                      } else {
-                                        String infoWaktu = getWaktuKategori();
-
-                                        String phone = aboutController
-                                                .aboutModelDesc
-                                                .value!
-                                                .telepon ??
-                                            '+62895321505858';
-                                        String infoAkun =
-                                            "Selamat $infoWaktu, perkenalkan saya :\n \n*Nama : ${authController.userAccount.value?.name}* \n*Telepon : ${authController.userAccount.value?.telepon}* \n*Alamat : ${authController.userAccount.value?.alamat}* \n \n";
-
-                                        String message = "$infoAkun"
-                                            "Ingin Melakukan Finishing Pada produk : \n\n"
-                                            "Nama item : ${product.title} \n"
-                                            "Warna : ${controller.selectedColorsName.value.join(", ")} \n"
-                                            "Biaya : ${formatRupiah(product.price)} \n";
-
-                                        final String url =
-                                            "https://wa.me/$phone?text=${Uri.encodeComponent(message)}";
-
-                                        if (await canLaunchUrl(
-                                            Uri.parse(url))) {
-                                          await launchUrl(Uri.parse(url));
-                                        } else {
-                                          throw 'Could not launch $url';
-                                        }
-                                      }
-                                    },
-                                    child: Center(
-                                        child: SvgPicture.asset(
-                                      "assets/images/wa.svg",
-                                      width: 40,
-                                      height: 40,
-                                    )),
-                                  )),
-                              Expanded(
-                                child: SizedBox(
-                                  height: 60,
-                                  child: ButtonPrimary(
-                                    backgroundColor: AppColors.primary,
-                                    isActive: true,
-                                    text: "Tambah ke keranjang",
-                                    onPressed: () async {
-                                      if (controller
-                                          .selectedIdColors.value.isEmpty) {
-                                        Get.snackbar("Maaf",
-                                            "Pilih warna terlebih dahulu");
-                                        return;
-                                      } else {
-                                        CartModel cart = CartModel(
-                                          userId: authController
-                                              .userAccount.value!.id
-                                              .toString(),
-                                          colors:
-                                              controller.selectedIdColors.value,
-                                          product: product,
-                                        );
-                                       
-                                        cartController.addDataCart(cart);
-                                      }
-                                    },
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                        )
-                  : Padding(
-                      padding: const EdgeInsets.all(18.0),
-                      child: Container(
-                          height: 60,
-                          decoration: BoxDecoration(
-                              color: AppColors.secoondarybuttton,
-                              borderRadius: BorderRadius.circular(12)),
-                          child: InkWell(
-                            onTap: () async {
-                              if (controller.selectedIdColors.value.isEmpty) {
-                                Get.snackbar(
-                                    "Maaf", "Pilih warna terlebih dahulu");
-                                return;
-                              } else {
-                                String infoWaktu = getWaktuKategori();
-
-                                String phone = aboutController
-                                        .aboutModelDesc.value!.telepon ??
-                                    '+62895321505858';
-                                String infoAkun = "Selamat $infoWaktu, ";
-
-                                String message = "$infoAkun"
-                                    "Saya ingin Melakukan Finishing Pada produk : \n\n"
-                                    "Nama item : ${product.title} \n"
-                                    "Warna: ${controller.selectedColorsName.value.join(", ")} \n"
-                                    "Biaya : ${formatRupiah(product.price)} \n";
-
-                                final String url =
-                                    "https://wa.me/$phone?text=${Uri.encodeComponent(message)}";
-
-                                if (await canLaunchUrl(Uri.parse(url))) {
-                                  await launchUrl(Uri.parse(url));
-                                } else {
-                                  throw 'Could not launch $url';
-                                }
-                              }
-                            },
-                            child: Center(
-                                child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                SvgPicture.asset(
-                                  "assets/images/wa.svg",
-                                  width: 40,
-                                  height: 40,
-                                ),
-                                const SizedBox(
-                                  width: 5.0,
-                                ),
-                                TextPrimary(
-                                  text: "Pesan Sekarang",
-                                  color: AppColors.primary,
-                                  fontSize: 18.0,
-                                  fontWeight: FontWeight.w500,
-                                )
-                              ],
-                            )),
-                          )),
-                    ),
             ),
     );
   }

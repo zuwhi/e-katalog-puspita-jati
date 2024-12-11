@@ -15,8 +15,6 @@ class CartController extends GetxController {
 
   RxInt totalHarga = 0.obs;
 
-  
-
   @override
   void onInit() {
     super.onInit();
@@ -67,6 +65,8 @@ class CartController extends GetxController {
     isloading.value = true;
     final Result result = await _appwriteService.deleteCart(documentId);
     if (result.isSuccess) {
+      listCart.value.removeAt(
+          listCart.value.indexWhere((element) => element.id == documentId));
       getDataCart();
       Get.snackbar("Berhasil", "berhasil menghapus item dari keranjang");
     } else {

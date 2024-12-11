@@ -8,6 +8,7 @@ import 'package:e_katalog/view/cart/cart_view.dart';
 import 'package:e_katalog/view/colors/colors_view.dart';
 import 'package:e_katalog/view/home/home_view.dart';
 import 'package:e_katalog/view/profile/profile_view.dart';
+import 'package:e_katalog/view/settings/settings_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -50,10 +51,11 @@ class NavigationView extends StatelessWidget {
                       case 2:
                         return authController.isLoggedIn.value ==
                                 AuthStatus.loggedIn
-                            ? const AboutView()
+                            ? const SettingsView()
                             : const ProfileView();
+
                       case 3:
-                        return const ProfileView();
+                        return const SettingsView();
 
                       default:
                         return const ProfileView();
@@ -74,15 +76,11 @@ class NavigationView extends StatelessWidget {
                                       label: 'Colors',
                                     ),
                                     BottomNavigationBarItem(
-                                      icon: Icon(Icons.store),
-                                      label: 'about',
-                                    ),
-                                    BottomNavigationBarItem(
-                                      icon: Icon(Icons.person),
-                                      label: 'Profile',
+                                      icon: Icon(Icons.settings),
+                                      label: 'Settings',
                                     ),
                                   ],
-                                  currentIndex: controller.currentView.value < 4
+                                  currentIndex: controller.currentView.value < 3
                                       ? controller.currentView.value
                                       : 0,
                                   unselectedIconTheme: const IconThemeData(
@@ -108,15 +106,11 @@ class NavigationView extends StatelessWidget {
                                       label: 'Keranjang',
                                     ),
                                     BottomNavigationBarItem(
-                                      icon: Icon(Icons.store),
-                                      label: 'about',
-                                    ),
-                                    BottomNavigationBarItem(
                                       icon: Icon(Icons.person),
                                       label: 'Profile',
                                     ),
                                   ],
-                                  currentIndex: controller.currentView.value < 4
+                                  currentIndex: controller.currentView.value < 3
                                       ? controller.currentView.value
                                       : 0,
                                   selectedItemColor: AppColors.primary,

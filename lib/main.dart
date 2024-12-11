@@ -1,4 +1,3 @@
-import 'package:device_preview/device_preview.dart';
 import 'package:e_katalog/constant/app_route.dart';
 import 'package:e_katalog/controller/auth_controller.dart';
 import 'package:e_katalog/service/appwrite_service.dart';
@@ -9,6 +8,9 @@ import 'package:e_katalog/view/cart/cart_view.dart';
 import 'package:e_katalog/view/colors/colors_view.dart';
 import 'package:e_katalog/view/home/home_view.dart';
 import 'package:e_katalog/view/home/navigation_view.dart';
+import 'package:e_katalog/view/kas/add_cash_category_view.dart';
+import 'package:e_katalog/view/kas/add_cash_view.dart';
+import 'package:e_katalog/view/kas/all_cash_view.dart';
 import 'package:e_katalog/view/loading.dart';
 import 'package:e_katalog/view/product/detail_product_view.dart';
 import 'package:e_katalog/view/product/edit_product.dart';
@@ -25,16 +27,15 @@ import 'utils/util.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Get.putAsync(() => AppwriteService().init());
-  runApp(DevicePreview(
-    enabled: !kReleaseMode,
-    builder: (context) => const MyApp(), // Wrap your app
-  ));
+  runApp(
+     const MyApp(), // Wrap your app
+   
+  );
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     // final brightness = View.of(context).platformDispatcher.platformBrightness;
@@ -105,6 +106,18 @@ class MyApp extends StatelessWidget {
           GetPage(
             name: AppRoute.colors,
             page: () => const ColorsView(),
+          ),
+          GetPage(
+            name: AppRoute.allCash,
+            page: () => const AllCashView(),
+          ),
+          GetPage(
+            name: AppRoute.addCash,
+            page: () => const AddCashView(),
+          ),
+          GetPage(
+            name: AppRoute.category,
+            page: () => const AddCashCategoryView(),
           ),
         ]);
   }

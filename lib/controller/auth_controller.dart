@@ -41,6 +41,7 @@ class AuthController extends GetxController {
         isLoggedIn.value = AuthStatus.loggedIn;
       }
     } on AppwriteException catch (e) {
+      Logger().d(e);
       if (e.code == 401) {
         isLoggedIn.value = AuthStatus.notLoggedIn;
       } else {

@@ -3,6 +3,7 @@ import 'package:e_katalog/constant/app_colors.dart';
 import 'package:e_katalog/constant/app_route.dart';
 import 'package:e_katalog/controller/about_controller.dart';
 import 'package:e_katalog/controller/auth_controller.dart';
+import 'package:e_katalog/controller/cash_controller.dart';
 import 'package:e_katalog/controller/colors_controller.dart';
 import 'package:e_katalog/controller/product_controller.dart';
 import 'package:e_katalog/helper/format_rupiah.dart';
@@ -27,6 +28,11 @@ class HomeView extends StatelessWidget {
 
     final ColorsController controller = Get.put(ColorsController());
     controller.getColorsList();
+
+// if   ( authController.userAccount.value != null && authController.userAccount.value!.role == "admin") {
+//       CashController cashController = Get.put(CashController());
+//       cashController.getAllCash();
+//     } 
 
     return authController.isLoading.value
         ? const Center(child: CircularProgressIndicator())

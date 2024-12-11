@@ -9,8 +9,8 @@ import 'package:e_katalog/view/about/about_admin_section.dart';
 import 'package:e_katalog/view/global/text_gelasio.dart';
 import 'package:e_katalog/view/global/text_primary.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class AboutView extends StatelessWidget {
   const AboutView({super.key});
@@ -100,14 +100,12 @@ class AboutView extends StatelessWidget {
                                       children: [
                                         InkWell(
                                           onTap: () async {
-                                            urlController.launchURL(
-                                                "https://wa.me/${about?.telepon}");
+                                            Clipboard.setData(ClipboardData(
+                                                text: about?.telepon ?? ""));
+                                            Get.snackbar("Berhasil",
+                                                "Nomor Telepon berhasil disalin");
                                           },
                                           child: SizedBox(
-                                            // width: MediaQuery.of(context)
-                                            //         .size
-                                            //         .width -
-                                            //     80,
                                             child: TextPrimary(
                                               text: about?.telepon ?? "",
                                               fontSize: 16.0,
@@ -143,15 +141,10 @@ class AboutView extends StatelessWidget {
                                       children: [
                                         InkWell(
                                           onTap: () async {
-                                            final Uri emailUri = Uri(
-                                              scheme: 'mailto',
-                                              path: about?.email ?? "",
-                                              query: 'subject=Pemesanan&body=',
-                                            );
-
-                                            if (await canLaunchUrl(emailUri)) {
-                                              await launchUrl(emailUri);
-                                            }
+                                            Clipboard.setData(ClipboardData(
+                                                text: about?.email ?? ""));
+                                            Get.snackbar("Berhasil",
+                                                "Alamat Email berhasil disalin");
                                           },
                                           child: SizedBox(
                                             child: TextPrimary(
@@ -189,8 +182,10 @@ class AboutView extends StatelessWidget {
                                       children: [
                                         InkWell(
                                           onTap: () async {
-                                            urlController.launchURL(
-                                                about?.koordinat ?? "");
+                                            Clipboard.setData(ClipboardData(
+                                                text: about?.alamat ?? ""));
+                                            Get.snackbar("Berhasil",
+                                                "Alamat berhasil disalin");
                                           },
                                           child: SizedBox(
                                             width: MediaQuery.of(context)
@@ -232,8 +227,10 @@ class AboutView extends StatelessWidget {
                                       children: [
                                         InkWell(
                                           onTap: () async {
-                                            urlController.launchURL(
-                                                about?.website ?? "");
+                                            Clipboard.setData(ClipboardData(
+                                                text: about?.website ?? ""));
+                                            Get.snackbar("Berhasil",
+                                                "Alamat Website berhasil disalin");
                                           },
                                           child: SizedBox(
                                             width: MediaQuery.of(context)

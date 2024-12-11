@@ -6,6 +6,8 @@ import 'package:e_katalog/constant/app_route.dart';
 import 'package:e_katalog/constant/appwrite_constants.dart';
 import 'package:e_katalog/model/about_model.dart';
 import 'package:e_katalog/model/cart_model.dart';
+import 'package:e_katalog/model/cash_category_model.dart';
+import 'package:e_katalog/model/cash_model.dart';
 import 'package:e_katalog/model/colors_model.dart';
 import 'package:e_katalog/model/product_image_model.dart';
 import 'package:e_katalog/model/product_model.dart';
@@ -29,6 +31,141 @@ class AppwriteService extends GetxService {
     databases = Databases(client);
     storage = Storage(client);
     return this;
+  }
+
+  Future<Result> addCashCategory(CashCategoryModel cashCategory) async {
+    try {
+      await databases.createDocument(
+        databaseId: AppwriteConstants.databaseId,
+        collectionId: AppwriteConstants.cashCategoryID,
+        documentId: ID.unique(),
+        data: {"category": cashCategory.category},
+      );
+      return const Result.success(true);
+    } catch (e) {
+      return Result.failed(e.toString());
+    }
+  }
+
+  Future<Result> updateCashCategory(CashCategoryModel cashCategory) async {
+    try {
+      await databases.updateDocument(
+        databaseId: AppwriteConstants.databaseId,
+        collectionId: AppwriteConstants.cashCategoryID,
+        documentId: cashCategory.id ?? "",
+        data: {"category": cashCategory.category},
+      );
+      return const Result.success(true);
+    } catch (e) {
+      return Result.failed(e.toString());
+    }
+  }
+
+  Future<Result> deleteCashCategory(String id) async {
+    try {
+      await databases.deleteDocument(
+        databaseId: AppwriteConstants.databaseId,
+        collectionId: AppwriteConstants.cashCategoryID,
+        documentId: id,
+      );
+      return const Result.success(true);
+    } catch (e) {
+      return Result.failed(e.toString());
+    }
+  }
+
+  Future<Result> getCashCategory() async {
+    try {
+      final response = await databases.listDocuments(
+        databaseId: AppwriteConstants.databaseId,
+        collectionId: AppwriteConstants.cashCategoryID,
+      );
+
+      List<CashCategoryModel> cashCategory = response.documents
+          .map((e) => CashCategoryModel.fromMap(e.data))
+          .toList();
+      return Result.success(cashCategory);
+    } catch (e) {
+      return Result.failed(e.toString());
+    }
+  }
+
+  Future<Result> deleteCash(String id, String? bucketId) async {
+    try {
+      await databases.deleteDocument(
+        databaseId: AppwriteConstants.databaseId,
+        collectionId: AppwriteConstants.cashCollectionID,
+        documentId: id,
+      );
+
+      if (bucketId != null) {
+        await storage.deleteFile(
+          bucketId: AppwriteConstants.cashBucket,
+          fileId: bucketId,
+        );
+      }
+
+      return const Result.success(true);
+    } catch (e) {
+      return Result.failed(e.toString());
+    }
+  }
+
+  Future<Result> getAllCash() async {
+    try {
+      final response = await databases.listDocuments(
+        databaseId: AppwriteConstants.databaseId,
+        collectionId: AppwriteConstants.cashCollectionID,
+      );
+
+      List<CashModel> cash =
+          response.documents.map((e) => CashModel.fromMap(e.data)).toList();
+      return Result.success(cash);
+    } catch (e) {
+      return Result.failed(e.toString());
+    }
+  }
+
+  Future<Result> addCash(CashModel cash, io.File? image) async {
+    try {
+      String? imageUrl;
+      String? bucketId;
+
+      if (image != null) {
+        final responseImg = await storage.createFile(
+          bucketId: AppwriteConstants.cashBucket,
+          fileId: ID.unique(),
+          file: InputFile.fromPath(
+            path: image.path,
+            filename: image.path.split('/').last,
+          ),
+        );
+        imageUrl =
+            '${AppwriteConstants.endpoint}/storage/buckets/${responseImg.bucketId}/files/${responseImg.$id}/view?project=${AppwriteConstants.projectId}&mode=admin';
+        bucketId = responseImg.$id;
+      }
+
+      Map<String, dynamic> data = {
+        "title": cash.title,
+        "tanggal": cash.tanggal,
+        "debet": cash.debet,
+        "kredit": cash.kredit,
+        "kategori": cash.kategori,
+      };
+      if (imageUrl != null) {
+        data['image'] = imageUrl;
+        data['bucket'] = bucketId;
+      }
+      await databases.createDocument(
+          databaseId: AppwriteConstants.databaseId,
+          collectionId: AppwriteConstants.cashCollectionID,
+          documentId: ID.unique(),
+          data: data);
+      return const Result.success("success");
+    } catch (e) {
+      Logger().d(e);
+      return Result.failed(e.toString());
+    }
   }
 
   Future<Result> getAboutDesc() async {
@@ -297,6 +434,7 @@ class AppwriteService extends GetxService {
       );
       return result;
     } on AppwriteException catch (e) {
+      Logger().d(e);
       if (e.code == 401) {
         throw ' email dan password salah';
       }

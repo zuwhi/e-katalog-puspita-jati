@@ -39,16 +39,17 @@ class AboutAdminSection extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const SizedBox(
+              height: 50.0,
+            ),
+            IconButton(
+                onPressed: () {
+                  Get.back();
+                },
+                icon: const Icon(Icons.arrow_back)),
             Center(
               child: TextGelasio(
                 text: "Ubah Profile",
-                fontSize: 20.0,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Center(
-              child: TextGelasio(
-                text: "Perusahaan",
                 fontSize: 20.0,
                 fontWeight: FontWeight.bold,
               ),
