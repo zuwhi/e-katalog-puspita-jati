@@ -5,9 +5,11 @@ import 'package:e_katalog/constant/app_colors.dart';
 import 'package:e_katalog/controller/about_controller.dart';
 import 'package:e_katalog/controller/auth_controller.dart';
 import 'package:e_katalog/controller/cart_controller.dart';
+import 'package:e_katalog/controller/internet_controller.dart';
 import 'package:e_katalog/helper/format_rupiah.dart';
 import 'package:e_katalog/model/cart_model.dart';
 import 'package:e_katalog/view/global/button_primary.dart';
+import 'package:e_katalog/view/global/no_internet_widget.dart';
 import 'package:e_katalog/view/global/text_primary.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -23,6 +25,8 @@ class CartView extends StatelessWidget {
     cartController.getDataCart();
 
     final AboutController aboutController = Get.find();
+
+    final internetController = Get.find<InternetController>();
 
     String getWaktuKategori() {
       DateTime now = DateTime.now();
@@ -45,157 +49,168 @@ class CartView extends StatelessWidget {
     return Obx(
       () => cartController.isloading.value
           ? const Scaffold(body: Center(child: CircularProgressIndicator()))
-          : Scaffold(
-              appBar: AppBar(
-                backgroundColor: Colors.white,
-                title: const Text("Keranjang"),
-                leading: Container(),
-                centerTitle: true,
-              ),
-              body: SingleChildScrollView(
-                child: Container(
-                  padding: const EdgeInsets.all(18.0),
-                  child: Column(
-                    children: [
-                      // List Produk dalam cart
-                      Obx(
-                        () => cartController.listCart.value.isEmpty
-                            ? Center(
-                                child: Padding(
-                                  padding: EdgeInsets.only(
-                                      top: MediaQuery.of(context).size.height /
-                                          3),
-                                  child: Column(
+          : internetController.isConnected.value == false
+              ? Scaffold(body: Center(child: NoInternetWidget(
+                  onPressed: () {
+                    cartController.getDataCart();
+                  },
+                )))
+              : Scaffold(
+                  appBar: AppBar(
+                    backgroundColor: Colors.white,
+                    title: const Text("Keranjang"),
+                    leading: Container(),
+                    centerTitle: true,
+                  ),
+                  body: SingleChildScrollView(
+                    child: Container(
+                      padding: const EdgeInsets.all(18.0),
+                      child: Column(
+                        children: [
+                          // List Produk dalam cart
+                          Obx(
+                            () => cartController.listCart.value.isEmpty
+                                ? Center(
+                                    child: Padding(
+                                      padding: EdgeInsets.only(
+                                          top: MediaQuery.of(context)
+                                                  .size
+                                                  .height /
+                                              3),
+                                      child: Column(
+                                        children: [
+                                          TextPrimary(
+                                            text: "Keranjang Masih Kosong :(",
+                                            fontSize: 22.0,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                          const SizedBox(
+                                            height: 10.0,
+                                          ),
+                                          TextPrimary(
+                                            text:
+                                                "dapatkan item di halaman utama",
+                                            fontSize: 18.0,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  )
+                                : Column(
                                     children: [
-                                      TextPrimary(
-                                        text: "Keranjang Masih Kosong :(",
-                                        fontSize: 22.0,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                      const SizedBox(
-                                        height: 10.0,
-                                      ),
-                                      TextPrimary(
-                                        text: "dapatkan item di halaman utama",
-                                        fontSize: 18.0,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              )
-                            : Column(
-                                children: [
-                                  ListView.builder(
-                                    itemCount:
-                                        cartController.listCart.value.length,
-                                    shrinkWrap: true,
-                                    physics: const ScrollPhysics(),
-                                    itemBuilder:
-                                        (BuildContext context, int index) {
-                                      CartModel product =
-                                          cartController.listCart.value[index];
+                                      ListView.builder(
+                                        itemCount: cartController
+                                            .listCart.value.length,
+                                        shrinkWrap: true,
+                                        physics: const ScrollPhysics(),
+                                        itemBuilder:
+                                            (BuildContext context, int index) {
+                                          CartModel product = cartController
+                                              .listCart.value[index];
 
-                                      return CardProductOnCartWidget(
-                                          controller: cartController,
-                                          product: product,
-                                          index: index);
-                                    },
-                                  ),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      TextPrimary(
-                                        text: "Total Harga: ",
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 16.0,
-                                      ),
-                                      Obx(
-                                        () {
-                                          int totalPrice =
-                                              cartController.priceList.fold(
-                                                  0, (sum, item) => sum + item);
-                                          return TextPrimary(
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 17.0,
-                                            text: formatRupiah(totalPrice),
-                                          );
+                                          return CardProductOnCartWidget(
+                                              controller: cartController,
+                                              product: product,
+                                              index: index);
                                         },
                                       ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          TextPrimary(
+                                            text: "Total Harga: ",
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 16.0,
+                                          ),
+                                          Obx(
+                                            () {
+                                              int totalPrice =
+                                                  cartController.priceList.fold(
+                                                      0,
+                                                      (sum, item) =>
+                                                          sum + item);
+                                              return TextPrimary(
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 17.0,
+                                                text: formatRupiah(totalPrice),
+                                              );
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(
+                                        height: 60.0,
+                                      ),
                                     ],
                                   ),
-                                  const SizedBox(
-                                    height: 60.0,
-                                  ),
-                                ],
-                              ),
+                          ),
+                          // Total Harga
+                        ],
                       ),
-                      // Total Harga
-                    ],
+                    ),
+                  ),
+                  floatingActionButtonLocation:
+                      FloatingActionButtonLocation.centerDocked,
+                  floatingActionButton: Obx(
+                    () => cartController.listCart.value.isEmpty
+                        ? Container()
+                        : Padding(
+                            padding: const EdgeInsets.all(18.0),
+                            child: ButtonPrimary(
+                              backgroundColor: AppColors.primary,
+                              text: "Checkout",
+                              onPressed: () async {
+                                String infoWaktu = getWaktuKategori();
+                                String phone = aboutController
+                                        .aboutModelDesc.value!.telepon ??
+                                    '+6281226965058';
+                                String infoAkun =
+                                    "Selamat $infoWaktu, perkenalkan saya :\n \n*Nama : ${authController.userAccount.value?.name}* \n*Telepon : ${authController.userAccount.value?.telepon}* \n*Alamat : ${authController.userAccount.value?.alamat}* \n \n";
+
+                                // Membuat pesan untuk setiap item di keranjang
+                                String productDetails = cartController
+                                    .listCart.value
+                                    .asMap()
+                                    .entries
+                                    .map((e) {
+                                  int index = e.key;
+                                  var product = e.value.product!;
+                                  int quantity = cartController.quantity[index];
+                                  List<dynamic> colors = e.value.colors!;
+
+                                  // Mendapatkan semua nama warna dan menggabungkannya dengan koma
+                                  String colorNames = colors
+                                      .map((color) => color["name"])
+                                      .join(", ");
+
+                                  return '*${index + 1}. ${product.title}* \n'
+                                      'jumlah : $quantity item\n'
+                                      'warna item : $colorNames \n'
+                                      'biaya : ${formatRupiah(cartController.priceList[index])} \n';
+                                }).join("\n");
+
+                                // Menggabungkan info akun dan detail produk ke dalam satu pesan
+                                String message = "$infoAkun"
+                                    "Ingin Melakukan Finishing Pada produk : \n\n"
+                                    "$productDetails \n\n"
+                                    "total biaya : ${formatRupiah(cartController.priceList.fold(0, (sum, item) => sum + item))}";
+
+                                final String url =
+                                    "https://wa.me/$phone?text=${Uri.encodeComponent(message)}";
+
+                                if (await canLaunchUrl(Uri.parse(url))) {
+                                  await launchUrl(Uri.parse(url));
+                                } else {
+                                  Get.snackbar("Terjadi kesalahan",
+                                      "tidak ditemukan whatsapp, Mohon install WhatsApp terlebih dahulu untuk melakukan pemesanan");
+                                }
+                              },
+                              isActive: true,
+                            ),
+                          ),
                   ),
                 ),
-              ),
-              floatingActionButtonLocation:
-                  FloatingActionButtonLocation.centerDocked,
-              floatingActionButton: Obx(
-                () => cartController.listCart.value.isEmpty
-                    ? Container()
-                    : Padding(
-                        padding: const EdgeInsets.all(18.0),
-                        child: ButtonPrimary(
-                          backgroundColor: AppColors.primary,
-                          text: "Checkout",
-                          onPressed: () async {
-                            String infoWaktu = getWaktuKategori();
-                            String phone =
-                                aboutController.aboutModelDesc.value!.telepon ??
-                                    '+6281226965058';
-                            String infoAkun =
-                                "Selamat $infoWaktu, perkenalkan saya :\n \n*Nama : ${authController.userAccount.value?.name}* \n*Telepon : ${authController.userAccount.value?.telepon}* \n*Alamat : ${authController.userAccount.value?.alamat}* \n \n";
-
-                            // Membuat pesan untuk setiap item di keranjang
-                            String productDetails = cartController
-                                .listCart.value
-                                .asMap()
-                                .entries
-                                .map((e) {
-                              int index = e.key;
-                              var product = e.value.product!;
-                              int quantity = cartController.quantity[index];
-                              List<dynamic> colors = e.value.colors!;
-
-                              // Mendapatkan semua nama warna dan menggabungkannya dengan koma
-                              String colorNames = colors
-                                  .map((color) => color["name"])
-                                  .join(", ");
-
-                              return '*${index + 1}. ${product.title}* \n'
-                                  'jumlah : $quantity item\n'
-                                  'warna item : $colorNames \n'
-                                  'biaya : ${formatRupiah(cartController.priceList[index])} \n';
-                            }).join("\n");
-
-                            // Menggabungkan info akun dan detail produk ke dalam satu pesan
-                            String message = "$infoAkun"
-                                "Ingin Melakukan Finishing Pada produk : \n\n"
-                                "$productDetails \n\n"
-                                "total biaya : ${formatRupiah(cartController.priceList.fold(0, (sum, item) => sum + item))}";
-
-                            final String url =
-                                "https://wa.me/$phone?text=${Uri.encodeComponent(message)}";
-
-                            if (await canLaunchUrl(Uri.parse(url))) {
-                              await launchUrl(Uri.parse(url));
-                            } else {
-                              Get.snackbar("Terjadi kesalahan",
-                                  "tidak ditemukan whatsapp, Mohon install WhatsApp terlebih dahulu untuk melakukan pemesanan");
-                            }
-                          },
-                          isActive: true,
-                        ),
-                      ),
-              ),
-            ),
     );
   }
 }

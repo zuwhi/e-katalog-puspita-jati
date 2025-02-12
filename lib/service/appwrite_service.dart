@@ -438,7 +438,7 @@ class AppwriteService extends GetxService {
       if (e.code == 401) {
         throw ' email dan password salah';
       }
-      throw 'terjadi kesalahan saat login, pastikan internet anda terhubung';
+      throw 'terjadi kesalahan saat login, $e';
     } catch (e) {
       throw 'terjadi kesalahan saat login, pastikan internet anda terhubung';
     }

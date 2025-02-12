@@ -103,7 +103,7 @@ class SetProductController extends GetxController {
       String? result = await aiService.sendRequest(prompt);
       productDescriptionController.text = result ?? '';
     } catch (e) {
-      Get.snackbar("gagal", "Maaf terjadi kesalahan");
+      Get.snackbar("gagal", "Maaf terjadi kesalahan $e");
     } finally {
       isLoadingOnDesc.value = false;
     }

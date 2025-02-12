@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:e_katalog/controller/cash_controller.dart';
+import 'package:e_katalog/helper/format_rupiah.dart';
 import 'package:e_katalog/model/cash_model.dart';
 import 'package:e_katalog/view/kas/image_preview.dart';
 import 'package:excel/excel.dart';
@@ -127,6 +128,7 @@ class CashDetailScreen extends StatelessWidget {
             fontSize: 17.0,
           ),
         ),
+        centerTitle: true,
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -194,9 +196,9 @@ class CashDetailScreen extends StatelessWidget {
                   Table(
                     border: TableBorder.all(color: Colors.black54),
                     columnWidths: const {
-                      0: FixedColumnWidth(200),
-                      1: FixedColumnWidth(100),
-                      2: FixedColumnWidth(100),
+                      0: FixedColumnWidth(160),
+                      1: FixedColumnWidth(120),
+                      2: FixedColumnWidth(120),
                     },
                     children: [
                       TableRow(children: [
@@ -207,7 +209,7 @@ class CashDetailScreen extends StatelessWidget {
                         ),
                         Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: Text(totalDebet.toString()),
+                          child: Text(formatRupiah(totalDebet)),
                         ),
                         const Padding(
                           padding: EdgeInsets.all(8.0),
@@ -226,7 +228,7 @@ class CashDetailScreen extends StatelessWidget {
                         ),
                         Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: Text(totalDebet.toString()),
+                          child: Text(formatRupiah(totalDebet)),
                         ),
                       ]),
                       const TableRow(children: [
@@ -253,7 +255,7 @@ class CashDetailScreen extends StatelessWidget {
                           ),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: Text(entry.value.toString()),
+                            child: Text(formatRupiah(entry.value)),
                           ),
                           const Padding(
                             padding: EdgeInsets.all(8.0),
@@ -272,9 +274,8 @@ class CashDetailScreen extends StatelessWidget {
                           child: Text(""),
                         ),
                         Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(totalBiaya.toString()),
-                        ),
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(formatRupiah(totalBiaya))),
                       ]),
                       TableRow(children: [
                         const Padding(
@@ -289,7 +290,7 @@ class CashDetailScreen extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Text(
-                            labaRugi.toString(),
+                            formatRupiah(labaRugi),
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: labaRugi >= 0 ? Colors.green : Colors.red,
@@ -353,9 +354,9 @@ class TabelHarianKas extends StatelessWidget {
             DataCell(Text(item.tanggal ?? '-')),
             DataCell(Text(item.title ?? '-')),
             DataCell(Text(item.kategori ?? '-')),
-            DataCell(Text(item.debet?.toString() ?? '-')),
-            DataCell(Text(item.kredit?.toString() ?? '-')),
-            DataCell(Text(saldo.toString())),
+            DataCell(Text(formatRupiah(item.debet?.toInt() ?? 0))),
+            DataCell(Text(formatRupiah(item.kredit?.toInt() ?? 0))),
+            DataCell(Text(formatRupiah(saldo.toInt()))),
             DataCell(IconButton(
                 icon: const Icon(Icons.remove_red_eye),
                 onPressed: () =>
@@ -392,10 +393,10 @@ class TabelHarianKas extends StatelessWidget {
                   style: TextStyle(fontWeight: FontWeight.bold))),
               const DataCell(Text('')),
               const DataCell(Text('')),
-              DataCell(Text(totalDebet.toString())),
-              DataCell(Text(totalKredit.toString())),
+              DataCell(Text(formatRupiah(totalDebet))),
+              DataCell(Text(formatRupiah(totalKredit))),
               DataCell(Text(
-                saldoAkhir.toString(),
+                formatRupiah(saldoAkhir),
                 style: const TextStyle(
                     color: Colors.red, fontWeight: FontWeight.bold),
               )),

@@ -3,6 +3,7 @@
 import 'package:e_katalog/constant/app_colors.dart';
 import 'package:e_katalog/constant/app_route.dart';
 import 'package:e_katalog/controller/auth_controller.dart';
+import 'package:e_katalog/controller/internet_controller.dart';
 import 'package:e_katalog/view/global/text_primary.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -13,7 +14,7 @@ class SettingsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AuthController authController = Get.find();
-
+   
     return Scaffold(
       appBar: AppBar(
         leading: Container(),

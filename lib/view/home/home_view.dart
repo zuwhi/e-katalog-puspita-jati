@@ -3,11 +3,12 @@ import 'package:e_katalog/constant/app_colors.dart';
 import 'package:e_katalog/constant/app_route.dart';
 import 'package:e_katalog/controller/about_controller.dart';
 import 'package:e_katalog/controller/auth_controller.dart';
-import 'package:e_katalog/controller/cash_controller.dart';
 import 'package:e_katalog/controller/colors_controller.dart';
+import 'package:e_katalog/controller/internet_controller.dart';
 import 'package:e_katalog/controller/product_controller.dart';
 import 'package:e_katalog/helper/format_rupiah.dart';
 import 'package:e_katalog/model/product_model.dart';
+import 'package:e_katalog/view/global/no_internet_widget.dart';
 import 'package:e_katalog/view/global/text_gelasio.dart';
 import 'package:e_katalog/view/global/text_primary.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +20,7 @@ class HomeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final internetController = Get.put(InternetController());
     final ProductController productController = Get.put(ProductController());
     final AuthController authController = Get.find();
     productController.getListProduct();
@@ -29,83 +31,89 @@ class HomeView extends StatelessWidget {
     final ColorsController controller = Get.put(ColorsController());
     controller.getColorsList();
 
-// if   ( authController.userAccount.value != null && authController.userAccount.value!.role == "admin") {
-//       CashController cashController = Get.put(CashController());
-//       cashController.getAllCash();
-//     } 
-
-    return authController.isLoading.value
+    return Obx(() => authController.isLoading.value ||
+            productController.isLoading.value
         ? const Center(child: CircularProgressIndicator())
-        : RefreshIndicator(
-            onRefresh: () async {
-              await productController.getListProduct();
-            },
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+        : internetController.isConnected.value == false
+            ? Center(
+                child: NoInternetWidget(onPressed: () {
+                  productController.getListProduct();
+                }),
+              )
+            : RefreshIndicator(
+                onRefresh: () async {
+                  await productController.getListProduct();
+                },
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
                       children: [
-                        Column(
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            TextGelasio(
-                                text: "PUSPITA",
-                                fontSize: 18.0,
-                                color: AppColors.secondary),
-                            TextGelasio(
-                                text: "JATI FURNITURE",
-                                fontSize: 18.0,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.primary),
+                            Column(
+                              children: [
+                                TextGelasio(
+                                    text: "KATALOG",
+                                    fontSize: 18.0,
+                                    color: AppColors.secondary),
+                                const SizedBox(
+                                  height: 4.0,
+                                ),
+                                TextGelasio(
+                                    text: "MEBEL JEPARA",
+                                    fontSize: 18.0,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.primary),
+                              ],
+                            ),
                           ],
+                        ),
+                        const SizedBox(
+                          height: 5.0,
+                        ),
+                        authController.userAccount.value != null
+                            ? authController.userAccount.value!.role == "admin"
+                                ? Align(
+                                    alignment: Alignment.topRight,
+                                    child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        elevation: 0,
+                                        side: const BorderSide(
+                                            color: Colors.black38),
+                                        backgroundColor: Colors.transparent,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                      ),
+                                      onPressed: () {
+                                        Get.toNamed(AppRoute.setProduct);
+                                      },
+                                      child: const Text("Tambah Item"),
+                                    ),
+                                  )
+                                : const SizedBox(
+                                    height: 0.0,
+                                  )
+                            : Container(),
+                        const SizedBox(
+                          height: 10.0,
+                        ),
+                        const CategoryWidget(),
+                        const SizedBox(
+                          height: 10.0,
+                        ),
+                        const GridCardProduct(),
+                        const SizedBox(
+                          height: 10.0,
                         ),
                       ],
                     ),
-                    const SizedBox(
-                      height: 10.0,
-                    ),
-                    authController.userAccount.value != null
-                        ? authController.userAccount.value!.role == "admin"
-                            ? Align(
-                                alignment: Alignment.topRight,
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    elevation: 0,
-                                    side:
-                                        const BorderSide(color: Colors.black38),
-                                    backgroundColor: Colors.transparent,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                  ),
-                                  onPressed: () {
-                                    Get.toNamed(AppRoute.setProduct);
-                                  },
-                                  child: const Text("Tambah Item"),
-                                ),
-                              )
-                            : const SizedBox(
-                                height: 0.0,
-                              )
-                        : Container(),
-                    const SizedBox(
-                      height: 10.0,
-                    ),
-                    const CategoryWidget(),
-                    const SizedBox(
-                      height: 10.0,
-                    ),
-                    const GridCardProduct(),
-                    const SizedBox(
-                      height: 10.0,
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
-          );
+              ));
   }
 }
 

@@ -1,5 +1,6 @@
 import 'package:e_katalog/constant/app_route.dart';
 import 'package:e_katalog/controller/auth_controller.dart';
+import 'package:e_katalog/controller/internet_controller.dart';
 import 'package:e_katalog/service/appwrite_service.dart';
 import 'package:e_katalog/view/about/about_view.dart';
 import 'package:e_katalog/view/auth/login_view.dart';
@@ -17,7 +18,6 @@ import 'package:e_katalog/view/product/edit_product.dart';
 import 'package:e_katalog/view/product/set_product_view.dart';
 import 'package:e_katalog/view/profile/profile_view.dart';
 import 'package:e_katalog/view/welcome/welcome_view.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -28,8 +28,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Get.putAsync(() => AppwriteService().init());
   runApp(
-     const MyApp(), // Wrap your app
-   
+    const MyApp(), // Wrap your app
   );
 }
 
@@ -43,10 +42,10 @@ class MyApp extends StatelessWidget {
     TextTheme textTheme = createTextTheme(context, "Roboto", "Nunito Sans");
 
     MaterialTheme theme = MaterialTheme(textTheme);
-
+    Get.put(InternetController());
     Get.put(AuthController());
     return GetMaterialApp(
-        title: 'Puspita Jati',
+        title: 'Katalog Mebel',
         theme: theme.light(),
         debugShowCheckedModeBanner: false,
         initialRoute: AppRoute.loading,

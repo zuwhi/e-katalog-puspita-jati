@@ -28,12 +28,10 @@ class LoginController extends GetxController {
     super.onClose();
   }
 
-  // Function to toggle password visibility
   void toggleObscurePassword() {
     obscurePassword.value = !obscurePassword.value;
   }
 
-  // Email validation function
   String? validateEmail(String email) {
     if (email.isEmpty) {
       return 'Email cannot be empty';

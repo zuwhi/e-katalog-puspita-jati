@@ -18,7 +18,6 @@ class ProductController extends GetxController {
       }
     } catch (e) {
       Logger().d(e);
-      Get.snackbar('terjadi kesalahan', e.toString());
     } finally {
       isLoading.value = false;
     }
@@ -51,7 +50,6 @@ class ProductController extends GetxController {
         return "lemari";
       case 5:
         return "bed";
-  
 
       default:
         return "All";

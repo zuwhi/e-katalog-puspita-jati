@@ -11,7 +11,22 @@ class CashController extends GetxController {
   RxList<CashModel> cash = <CashModel>[].obs;
   RxBool isLoading = false.obs;
   final selectedCategory = RxnString();
+  final RxBool isFilterByMonth = true.obs;
+  final RxString searchQuery = ''.obs;
+  RxBool showButton = false.obs;
 
+  List<CashModel> filteredData() {
+    String query = searchQuery.value.toLowerCase();
+    return cash.where((item) {
+      if (isFilterByMonth.value) {
+        // Filter berdasarkan bulan
+        return item.tanggal?.toLowerCase().startsWith(query) ?? false;
+      } else {
+        // Filter berdasarkan tahun
+        return item.tanggal?.toLowerCase().contains(query) ?? false;
+      }
+    }).toList();
+  }
   Future<void> getAllCash() async {
     isLoading.value = true;
     final result = await _appwriteService.getAllCash();

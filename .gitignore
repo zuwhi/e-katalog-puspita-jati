@@ -47,3 +47,5 @@ app.*.map.json
 
 # Contoh penambahan untuk mengabaikan file tertentu
 lib/constant/appwrite_constants.dart
+
+.vscode/templates

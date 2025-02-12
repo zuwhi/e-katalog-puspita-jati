@@ -45,7 +45,7 @@ class AuthController extends GetxController {
       if (e.code == 401) {
         isLoggedIn.value = AuthStatus.notLoggedIn;
       } else {
-        Get.snackbar("Gagal memuat account", "Periksa koneksi internet anda");
+        isLoggedIn.value = AuthStatus.error;
       }
     } catch (e) {
       Get.snackbar("Gagal memuat account", "Periksa koneksi internet anda");

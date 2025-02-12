@@ -5,7 +5,7 @@
     <uses-permission android:name="android.permission.CAMERA"/>
 
     <application
-        android:label="E-katalog Mebel"
+        android:label="Katalog Mebel Jepara"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon" 
         android:requestLegacyExternalStorage="true">

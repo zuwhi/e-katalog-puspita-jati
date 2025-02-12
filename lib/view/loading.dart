@@ -2,6 +2,7 @@
 
 import 'package:e_katalog/constant/app_route.dart';
 import 'package:e_katalog/controller/auth_controller.dart';
+import 'package:e_katalog/view/global/no_internet_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
@@ -43,8 +44,14 @@ class _LoadingViewState extends State<LoadingView> {
           physics: const AlwaysScrollableScrollPhysics(),
           child: SizedBox(
             height: MediaQuery.of(context).size.height,
-            child: const Center(
-              child: CircularProgressIndicator(),
+            child: Center(
+              child: Obx(() =>
+                  authController.isLoggedIn.value == AuthStatus.error &&
+                          authController.isLoading.value == false
+                      ? NoInternetWidget(
+                          onPressed: _checkLoginStatus,
+                        )
+                      : const CircularProgressIndicator()),
             ),
           ),
         ),

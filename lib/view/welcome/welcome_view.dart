@@ -30,17 +30,20 @@ class WelcomeView extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     TextGelasio(
-                      fontSize: 25.0,
-                      text: "PUSPITA",
+                      fontSize: 26.0,
+                      text: "KATALOG",
                       color: AppColors.primary,
+                    ),
+                    const SizedBox(
+                      height: 8.0,
                     ),
                     TextGelasio(
                       fontSize: 25.0,
-                      text: "JATI FURNITURE",
+                      text: "MEBEL JEPARA",
                       color: AppColors.secondary,
                     ),
                     const SizedBox(
-                      height: 20.0,
+                      height: 10.0,
                     ),
                     const Padding(
                       padding: EdgeInsets.only(left: 45),
@@ -52,7 +55,7 @@ class WelcomeView extends StatelessWidget {
                                 height: 2,
                                 fontSize: 18.0,
                                 color: AppColors.secondary),
-                            "The best simple place where you discover most wonderful furnitures and make your home beautiful"),
+                            "Selamat datang di Aplikasi Katalog Mebel Jepara, aplikasi ini dapat membantu mu dalam memilih finishing furniture yang kamu sukai."),
                       ),
                     )
                   ]),
